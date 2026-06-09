@@ -1,0 +1,1570 @@
+Create a complete professional mobile-first marketplace application called **Only Creators**.
+
+## APP OVERVIEW
+
+Only Creators is a gaming-focused creator marketplace where users can browse services and directly contact creators for gaming-related content creation work.
+
+The app must be fully optimized for Android and iOS mobile devices and should feel like a native mobile application.
+
+Do NOT build a simple landing page or portfolio website.
+
+Build a complete multi-page marketplace application with authentication, creator profiles, sample showcases, likes, comments, admin panel, search, filters, and contact features.
+
+---
+
+# DESIGN REQUIREMENTS
+
+Theme: Gaming
+
+Primary Color: Violet / Purple Neon
+
+Style:
+
+* Dark Mode
+* Glassmorphism
+* Premium Gaming UI
+* Smooth Animations
+* Mobile Friendly
+* Touch Optimized
+* Modern Marketplace Design
+
+App Name:
+**Only Creators**
+
+Logo:
+Placeholder for future logo upload.
+
+---
+
+# ACCOUNT TYPES
+
+## Customer Account
+
+Can:
+
+* Browse Services
+* View Samples
+* Like Samples
+* Comment on Samples
+* Save Favorites
+* Contact Creators
+
+## Creator Account
+
+Can:
+
+* Create Creator Profile
+* Upload Samples
+* Manage Samples
+* Edit Samples
+* Delete Samples
+* View Likes
+* View Comments
+
+---
+
+# AUTHENTICATION SYSTEM
+
+## Login Page
+
+* Email
+* Password
+* Login Button
+* Forgot Password
+* Sign Up Button
+
+## Sign Up Page
+
+* Username
+* Email
+* Password
+* Confirm Password
+* Account Type Selection:
+
+  * Customer
+  * Creator
+
+## User Profile
+
+* Profile Picture
+* Username
+* Bio
+* Saved Samples
+* Liked Samples
+
+---
+
+# CREATOR PROFILE
+
+Creators can set:
+
+* Profile Picture
+* Display Name
+* Bio
+* Gmail Address
+* Discord Username
+* Services Offered
+* Experience
+* Portfolio
+* Social Links
+
+Creator profiles should be publicly viewable.
+
+---
+
+# HOME PAGE
+
+Display categories as attractive gaming cards.
+
+Categories:
+
+1. Thumbnail Designing
+2. Video Editing
+3. Custom Resource Packs
+4. VFX
+5. GFX
+6. Custom Models
+7. Server Developers
+8. Recording Managers
+9. Plugin Makers
+
+Include:
+
+* Search Bar
+* Trending Samples
+* Most Liked Creators
+* Recently Added Samples
+* Category Filters
+
+---
+
+# THUMBNAIL DESIGNING
+
+Game Options:
+
+* Minecraft
+* Roblox
+* BGMI
+* Free Fire
+* Valorant
+* Fortnite
+* Others
+
+Budget Options:
+
+₹50
+₹100
+₹150
+₹200
+₹250
+₹300
+₹400
+₹500
+₹600
+₹700
+₹800
+₹900
+₹1000
+
+After selecting budget:
+
+Display Thumbnail Samples.
+
+Each sample card must contain:
+
+* Preview Image
+* Creator Name
+* Price
+* Likes
+* Comments
+* View Details Button
+
+Sample Details Page:
+
+* Large Preview
+* Creator Profile
+* Description
+* Price
+* Contact Section
+
+Contact Section:
+
+* Gmail Address
+* Discord Username
+* Copy Contact Button
+
+---
+
+# VIDEO EDITING
+
+Options:
+
+* Minecraft
+* Roblox
+* BGMI
+* Free Fire
+* Valorant
+* Fortnite
+* Others
+* Anime Edits
+
+Budget System:
+
+₹50 to ₹1000
+
+Display:
+
+* Video Preview
+* Editor Name
+* Likes
+* Comments
+* Contact Details
+
+---
+
+# CUSTOM RESOURCE PACKS
+
+Only Minecraft.
+
+Display:
+
+* Resource Pack Samples
+* Minecraft Version
+* Budget
+* Creator Details
+* Likes
+* Comments
+* Contact Information
+
+---
+
+# VFX
+
+Flow:
+
+Game Selection → Budget Selection → Samples → Creator Details
+
+---
+
+# GFX
+
+Flow:
+
+Game Selection → Budget Selection → Samples → Creator Details
+
+---
+
+# CUSTOM MODELS
+
+Minecraft Only.
+
+Display:
+
+* Model Previews
+* Minecraft Version
+* Budget
+* Creator Details
+
+---
+
+# SERVER DEVELOPERS
+
+Services:
+
+* Survival Servers
+* Lifesteal Servers
+* Factions Servers
+* Skyblock Servers
+* Minigame Servers
+* Custom Servers
+
+Display:
+
+* Portfolio
+* Price
+* Creator Details
+* Contact Information
+
+---
+
+# RECORDING MANAGERS
+
+Display:
+
+* Experience
+* Portfolio
+* Price
+* Gmail
+* Discord
+* Likes
+* Comments
+
+---
+
+# PLUGIN MAKERS
+
+Display:
+
+* Plugin Showcase
+* Features
+* Price
+* Creator Information
+* Contact Information
+
+---
+
+# SAMPLE UPLOAD SYSTEM
+
+Creators can upload samples.
+
+Required Fields:
+
+* Title
+* Description
+* Category
+* Game Type
+* Budget Range
+* Preview Images
+* Tags
+
+Samples should support image uploads and video preview links.
+
+---
+
+# CATEGORY-SPECIFIC UPLOADS
+
+Thumbnail:
+
+* Thumbnail Image
+* Game
+* Budget
+
+Video Editing:
+
+* Preview Video
+* Video Thumbnail
+* Game Type
+* Budget
+
+Resource Pack:
+
+* Resource Pack Images
+* Minecraft Version
+* Budget
+
+VFX:
+
+* Preview Images or Videos
+* Budget
+
+GFX:
+
+* Preview Images
+* Budget
+
+Custom Models:
+
+* Model Images
+* Minecraft Version
+* Budget
+
+Server Developers:
+
+* Portfolio Images
+* Server Type
+* Budget
+
+Plugin Makers:
+
+* Plugin Showcase
+* Features
+* Budget
+
+---
+
+# CREATOR DASHBOARD
+
+Creators can:
+
+* Upload Samples
+* Edit Samples
+* Delete Samples
+* Manage Profile
+* View Likes
+* View Comments
+* Track Sample Performance
+
+---
+
+# COMMUNITY FEATURES
+
+Include:
+
+* Like System
+* Comment System
+* Favorite System
+* Search System
+* Filters
+* Trending Section
+* Creator Profiles
+
+---
+
+# ADMIN PANEL
+
+Admin can:
+
+* Approve Samples
+* Reject Samples
+* Delete Samples
+* Ban Users
+* Manage Comments
+* Manage Categories
+* Feature Creators
+
+---
+
+# SAMPLE APPROVAL SYSTEM
+
+Every uploaded sample enters:
+
+Pending Review
+
+Admin can:
+
+* Approve
+* Reject
+
+Only approved samples become public.
+
+---
+
+# DATABASE
+
+Store:
+
+* Users
+* Creator Profiles
+* Samples
+* Likes
+* Comments
+* Favorites
+* Categories
+* Budgets
+* Contact Information
+
+Use a scalable database structure.
+
+---
+
+# PERFORMANCE
+
+Requirements:
+
+* Fast Loading
+* Mobile Responsive
+* Secure Authentication
+* Optimized Images
+* Smooth Navigation
+* Premium Gaming Experience
+
+Build all pages, components, authentication, creator dashboard, sample upload system, likes, comments, admin panel, search, filters, and database integration exactly as described above.
+
+
+# CREATOR SYSTEM
+
+The platform must support two account types:
+
+### 1. Customer Account
+
+Users who browse services, view samples, like, comment, and contact creators.
+
+### 2. Creator Account
+
+Users who provide services and upload portfolios/samples.
+
+---
+
+# CREATOR REGISTRATION
+
+Creators can create a Creator Profile containing:
+
+* Profile Picture
+* Display Name
+* Bio
+* Discord Username
+* Gmail Address
+* Services Offered
+* Experience Level
+* Portfolio
+* Social Links (Optional)
+
+---
+
+# SAMPLE UPLOAD SYSTEM
+
+Creators must be able to upload samples from their dashboard.
+
+For each sample upload:
+
+* Title
+* Description
+* Category
+* Game Type
+* Budget Range
+* Preview Images
+* Tags
+* Contact Information
+
+Supported Categories:
+
+* Thumbnail Designing
+* Video Editing
+* Custom Resource Packs
+* VFX
+* GFX
+* Custom Models
+* Server Developers
+* Recording Managers
+* Plugin Makers
+
+---
+
+# CATEGORY-SPECIFIC UPLOADS
+
+### Thumbnail Upload
+
+* Thumbnail Image
+* Supported Game
+* Budget Tier
+
+### Video Editing Upload
+
+* Video Thumbnail
+* Video Preview URL
+* Supported Game or Anime Edit
+* Budget Tier
+
+### Resource Pack Upload
+
+* Resource Pack Images
+* Minecraft Version
+* Budget Tier
+
+### VFX Upload
+
+* Preview Images or Videos
+* Budget Tier
+
+### GFX Upload
+
+* Preview Images
+* Budget Tier
+
+### Custom Models Upload
+
+* Model Images
+* Minecraft Version
+* Budget Tier
+
+### Server Developer Upload
+
+* Portfolio Images
+* Server Type
+* Budget Tier
+
+### Plugin Maker Upload
+
+* Plugin Showcase
+* Features
+* Budget Tier
+
+---
+
+# CREATOR DASHBOARD
+
+Creators should have a dashboard where they can:
+
+* Upload Samples
+* Edit Samples
+* Delete Samples
+* View Likes
+* View Comments
+* Manage Profile
+* Track Sample Performance
+
+---
+
+# SAMPLE APPROVAL SYSTEM
+
+When a creator uploads a sample:
+
+* Sample enters Pending Review
+* Admin can Approve or Reject
+* Only Approved Samples become public
+
+---
+
+# SAMPLE DISPLAY
+
+Users can:
+
+* View Samples
+* Like Samples
+* Comment on Samples
+* Save Favorites
+* Contact Creators
+
+Samples should automatically appear in the correct category, game section, and budget section after approval.
+
+
+Create a complete professional cross-platform marketplace application called **Only Creators**.
+
+## PLATFORM COMPATIBILITY
+
+The application must work perfectly on:
+
+* Android Phones
+* iPhones (iOS)
+* Windows PCs
+* Mac Computers
+* Linux Computers
+
+The platform should function as both:
+
+* A mobile application experience
+* A desktop website experience
+
+The UI must automatically adapt to all screen sizes using responsive design.
+
+Requirements:
+
+* Mobile-friendly layouts
+* Tablet support
+* Desktop support
+* Responsive navigation
+* Responsive cards and grids
+* Responsive creator dashboard
+* Responsive admin panel
+* Touch-friendly controls on mobile
+* Sidebar navigation on desktop
+* Optimized performance on all devices
+
+Creators should be able to upload and manage their work comfortably from desktop computers, while customers should be able to browse services and contact creators easily from mobile devices.
+
+Use a modern responsive design system that provides a premium experience across all devices.
+
+## APP OVERVIEW
+
+Only Creators is a gaming-focused creator marketplace where users can browse services, view creator portfolios, like and comment on samples, and directly contact creators for gaming-related content creation services.
+
+Do NOT create a simple landing page or portfolio website.
+
+Build a complete multi-page marketplace platform with authentication, creator profiles, sample uploads, admin controls, search, filters, likes, comments, favorites, and database integration.
+
+
+Use a premium modern gaming aesthetic. Keep the dark violet neon glassmorphism theme.
+
+Fonts:
+- Headings: Orbitron or Space Grotesk
+- Body Text: Inter
+
+Design Style:
+- Gaming-inspired but professional
+- Clean and premium, not overly futuristic
+- Smooth animations
+- Neon violet highlights
+- Glassmorphism cards
+- Rounded corners
+- High readability
+- Creator-focused marketplace UI
+
+The overall look should feel like a mix of Discord, Fiverr, and a modern gaming platform.
+
+
+Use a premium modern gaming aesthetic with a dark violet neon glassmorphism theme.
+
+Fonts:
+
+* Headings: Orbitron
+* Secondary Headings: Space Grotesk
+* Body Text: Inter
+
+Design Inspiration:
+
+* Discord
+* Fiverr
+* Dribbble
+* Behance
+* Modern Gaming Platforms
+
+Visual Style:
+
+* Premium
+* Professional
+* Creator-focused
+* Clean
+* Modern
+* High-end
+* Smooth and polished
+
+UI Features:
+
+* Smooth page transitions
+* Hover animations
+* Loading animations
+* Skeleton loaders
+* Glassmorphism cards
+* Neon glow effects
+* Soft shadows
+* Rounded corners
+* Responsive layouts
+* Beautiful empty states
+* Premium dashboard design
+
+Homepage Features:
+
+* Hero Banner
+* Featured Creators
+* Trending Services
+* Recently Uploaded Samples
+* Most Liked Creators
+* Top Rated Creators
+* Recommended Services
+* Popular Categories
+
+Creator Profiles:
+
+* Verified Creator Badge
+* Creator Level System
+* Portfolio Gallery
+* Total Likes
+* Total Projects
+* Join Date
+* Reviews Section
+* Creator Statistics
+
+Community Features:
+
+* Follow Creators
+* Creator Followers Count
+* Creator Following Count
+* Save Samples
+* Share Samples
+* Report Samples
+* Report Users
+
+Gamification:
+
+* Creator Levels
+* Experience System
+* Achievement Badges
+* Top Creator Rankings
+* Monthly Leaderboards
+* Featured Creator Program
+
+Search Features:
+
+* Global Search
+* Category Filters
+* Game Filters
+* Budget Filters
+* Trending Search Suggestions
+
+Creator Dashboard Features:
+
+* Analytics
+* Sample Performance
+* Likes Analytics
+* Comments Analytics
+* Profile Views
+* Upload Statistics
+
+Admin Panel Features:
+
+* User Management
+* Creator Management
+* Content Moderation
+* Sample Approval System
+* Featured Creator Controls
+* Analytics Dashboard
+
+Performance Requirements:
+
+* Fast Loading
+* Optimized Images
+* Lazy Loading
+* Mobile Optimization
+* Desktop Optimization
+
+The final design should feel like a premium gaming creator marketplace worth using by Minecraft, Roblox, BGMI, Valorant, Fortnite, and content creators worldwide.
+
+
+
+# ADDITIONAL ADVANCED FEATURES
+
+## MOD REQUEST MARKETPLACE
+
+Add a dedicated "Mods" category.
+
+Users should be able to describe the exact mod they want.
+
+Request Form:
+
+* Mod Name (Optional)
+* Minecraft Version
+* Java or Bedrock
+* Mod Type
+* Description
+* Budget
+* Deadline
+
+Examples:
+
+* Chess Minigame Mod
+* Parkour Mod
+* RPG Mod
+* Custom Weapons Mod
+* Economy Mod
+* Lifesteal Mod
+* Custom Mobs Mod
+
+Mod developers can browse requests and contact users.
+
+Users can also receive offers from multiple mod developers.
+
+---
+
+## CUSTOM REQUEST SYSTEM
+
+Users should be able to create custom requests for:
+
+* Thumbnails
+* Video Editing
+* Resource Packs
+* Mods
+* Plugins
+* VFX
+* GFX
+* Custom Models
+* Server Development
+
+The request form should allow detailed descriptions, reference images, budget, and deadline.
+
+Creators can respond to requests and submit offers.
+
+---
+
+## REAL-TIME CHAT SYSTEM
+
+Add a built-in chat system.
+
+Users should be able to directly chat with creators.
+
+Features:
+
+* One-to-one Messaging
+* Real-time Chat
+* File Sharing
+* Image Sharing
+* Read Receipts
+* Online Status
+* Typing Indicator
+* Chat History
+* Block User Option
+* Report User Option
+
+Users should be able to contact a creator directly from a sample page.
+
+---
+
+## PAYMENT SYSTEM
+
+Implement a secure payment system.
+
+Supported Payments:
+
+* UPI
+* Google Pay
+* PhonePe
+* Paytm
+* Credit Card
+* Debit Card
+
+Users can:
+
+* Purchase Services
+* Purchase Premium Mods
+* Purchase Plugins
+* Purchase Resource Packs
+* Purchase Custom Assets
+
+---
+
+## DIGITAL MARKETPLACE
+
+Creators can sell digital products.
+
+Examples:
+
+* Premium Minecraft Mods
+* Plugins
+* Resource Packs
+* GFX Packs
+* VFX Packs
+* Templates
+
+Each product should have:
+
+* Screenshots
+* Description
+* Features
+* Price
+* Ratings
+* Reviews
+
+After payment:
+
+* Instant Download
+* Download History
+* Purchased Products Section
+
+Example:
+
+Chess Minigame Mod = ₹50
+
+User pays → Download unlocks instantly.
+
+---
+
+## ORDER MANAGEMENT SYSTEM
+
+After placing an order:
+
+Status Flow:
+
+* Pending
+* Accepted
+* In Progress
+* Completed
+* Delivered
+* Cancelled
+
+Users can track progress.
+
+Creators can update status.
+
+---
+
+## REVIEW SYSTEM
+
+After order completion:
+
+Users can:
+
+* Leave Reviews
+* Give Star Ratings
+* Write Feedback
+
+Creator profiles should display ratings.
+
+---
+
+## AI SUPPORT CHATBOT
+
+Add an AI chatbot called "Only Creators Assistant".
+
+The chatbot should:
+
+* Guide new users
+* Explain website features
+* Help find categories
+* Help locate creators
+* Help with payments
+* Help with downloads
+* Help with account issues
+
+---
+
+## SUPPORT & REPORT SYSTEM
+
+Users can report:
+
+* Bugs
+* Payment Issues
+* Scam Reports
+* Creator Misconduct
+* Technical Problems
+
+Support Ticket Fields:
+
+* Subject
+* Category
+* Description
+* Screenshots
+* Priority Level
+
+Admins can manage tickets through the admin panel.
+
+---
+
+## ESCROW PAYMENT SYSTEM
+
+For custom work:
+
+User pays first.
+
+Money is held safely.
+
+Creator receives payment only after work delivery and user approval.
+
+This protects both customers and creators.
+
+---
+
+## NOTIFICATION SYSTEM
+
+Real-time notifications for:
+
+* New Messages
+* New Orders
+* Order Updates
+* Likes
+* Comments
+* Reviews
+* Downloads
+* Payment Confirmations
+
+Notifications should work on both desktop and mobile devices.
+
+
+
+
+
+
+# ADVANCED BUSINESS FEATURES
+
+## CREATOR VERIFICATION SYSTEM
+
+Creator Types:
+
+* Normal Creator
+* Verified Creator
+* Premium Creator
+
+Verified creators receive:
+
+* Verified Badge
+* Higher Search Ranking
+* Increased Trust Score
+
+Premium creators receive:
+
+* Premium Badge
+* Priority Placement
+* Advanced Analytics
+* Homepage Exposure
+
+---
+
+## CREATOR LEVEL SYSTEM
+
+Levels:
+
+* Beginner
+* Skilled
+* Professional
+* Expert
+* Legendary
+
+Levels increase based on:
+
+* Completed Orders
+* Reviews
+* Ratings
+* Likes
+* Activity
+
+---
+
+## FOLLOW SYSTEM
+
+Users can:
+
+* Follow Creators
+* Unfollow Creators
+* Receive Updates
+
+Creator profiles should display:
+
+* Followers
+* Following
+* Total Likes
+
+---
+
+## REQUEST BOARD
+
+Users can post requests.
+
+Examples:
+
+* Need Minecraft Thumbnail
+* Need Resource Pack
+* Need Plugin
+* Need Video Edit
+* Need Minecraft Mod
+
+Creators can apply to requests.
+
+Users can compare creator offers.
+
+---
+
+## CREATOR TEAMS & STUDIOS
+
+Creators can create teams.
+
+Example:
+
+Terror Studio
+
+Members:
+
+* Thumbnail Designer
+* Video Editor
+* Resource Pack Developer
+* Plugin Developer
+* Mod Developer
+
+Users can hire an entire team.
+
+---
+
+## DIGITAL PRODUCT MARKETPLACE
+
+Creators can sell:
+
+* Minecraft Mods
+* Plugins
+* Resource Packs
+* VFX Packs
+* GFX Packs
+* Templates
+* Presets
+
+Products can be:
+
+* Free
+* Premium
+
+Premium products require payment.
+
+After successful payment:
+
+* Instant Download Unlock
+* Purchase History
+* Download History
+
+---
+
+## MOD MARKETPLACE
+
+Dedicated Mods Section.
+
+Users can:
+
+* Browse Mods
+* Purchase Mods
+* Download Mods
+
+Example:
+
+Chess Minigame Mod = ₹50
+
+User pays.
+
+Download unlocks instantly.
+
+---
+
+## CUSTOM MOD REQUESTS
+
+Users can describe the mod they want.
+
+Fields:
+
+* Minecraft Version
+* Java or Bedrock
+* Mod Type
+* Budget
+* Description
+* Deadline
+
+Mod developers can respond.
+
+---
+
+## CUSTOM PROJECT REQUEST SYSTEM
+
+Users can create custom requests for:
+
+* Thumbnails
+* Video Editing
+* Mods
+* Plugins
+* Resource Packs
+* VFX
+* GFX
+* Models
+* Server Development
+
+Users can upload reference images.
+
+Creators can submit offers.
+
+---
+
+## REAL-TIME CHAT SYSTEM
+
+Built-in messaging.
+
+Features:
+
+* One-to-One Messaging
+* Real-Time Chat
+* File Sharing
+* Image Sharing
+* Typing Indicator
+* Read Receipts
+* Chat History
+* Online Status
+
+Users can directly message creators from sample pages.
+
+---
+
+## ORDER MANAGEMENT
+
+Order Status:
+
+* Pending
+* Accepted
+* In Progress
+* Delivered
+* Completed
+* Cancelled
+
+Users and creators can track orders.
+
+---
+
+## REVIEW SYSTEM
+
+After order completion:
+
+Users can leave:
+
+* Ratings
+* Reviews
+* Feedback
+
+Reviews appear on creator profiles.
+
+---
+
+## AI SUPPORT CHATBOT
+
+Create an AI assistant called:
+
+Only Creators Assistant
+
+Functions:
+
+* Help New Users
+* Explain Features
+* Guide Navigation
+* Solve Common Problems
+* Help With Payments
+* Help With Downloads
+* Help With Orders
+
+---
+
+## SUPPORT TICKET SYSTEM
+
+Users can report:
+
+* Bugs
+* Technical Issues
+* Payment Problems
+* Scam Reports
+* Creator Misconduct
+
+Support Tickets should include:
+
+* Subject
+* Description
+* Screenshots
+* Priority
+
+Admins can manage tickets.
+
+---
+
+## NOTIFICATION SYSTEM
+
+Real-Time Notifications:
+
+* Messages
+* Orders
+* Likes
+* Comments
+* Reviews
+* Downloads
+* Payments
+* Creator Updates
+
+---
+
+# MONETIZATION SYSTEM
+
+## PLATFORM COMMISSION
+
+Charge a commission on every completed order.
+
+Suggested:
+
+5%–10%
+
+Platform automatically deducts the commission.
+
+---
+
+## PREMIUM CREATOR MEMBERSHIP
+
+Monthly Subscription Plans.
+
+Premium Benefits:
+
+* Unlimited Uploads
+* Premium Badge
+* Better Visibility
+* Advanced Analytics
+* Priority Search Ranking
+
+---
+
+## FEATURED CREATOR ADS
+
+Creators can pay to appear on:
+
+* Homepage
+* Featured Section
+* Search Results
+
+---
+
+## FEATURED SERVICE ADS
+
+Creators can promote:
+
+* Thumbnails
+* Mods
+* Plugins
+* Resource Packs
+* Editing Services
+
+---
+
+## VERIFIED CREATOR SUBSCRIPTION
+
+Paid verification options.
+
+Includes:
+
+* Verified Badge
+* Increased Trust
+* Better Ranking
+
+---
+
+## STUDIO PLANS
+
+Teams and Studios can purchase professional subscriptions.
+
+Benefits:
+
+* Multiple Team Members
+* Team Dashboard
+* Studio Analytics
+* Studio Verification
+
+---
+
+## CREATOR ANALYTICS
+
+Creators can see:
+
+* Profile Views
+* Clicks
+* Likes
+* Followers
+* Downloads
+* Orders
+* Revenue
+
+---
+
+## COMMUNITY FEATURES
+
+* Trending Creators
+* Monthly Leaderboards
+* Achievement Badges
+* Top Rated Creators
+* Featured Creator Program
+* Creator Competitions
+
+---
+
+The platform should feel like a combination of Fiverr, Discord, Minecraft Marketplace, Behance, and a modern gaming creator hub while remaining professional, scalable, and optimized for both desktop and mobile users.
+
+
+
+ADDITIONAL FEATURES TO INCLUDE:
+
+1. 🎥 CINEMATICS SECTION
+
+* Add a dedicated "Cinematics" category.
+* Users can hire creators to make Minecraft cinematics, trailers, intros, showcases, server advertisements, and promotional videos.
+* Include budget selection, sample previews, likes, comments, creator profile, direct chat, and contact information similar to other services.
+
+2. 🏰 HIRE A BUILDER
+
+* Add a "Hire Builder" section specifically for Minecraft builders.
+* Builders can upload their previous builds as portfolio samples.
+* Each builder profile should display:
+
+  * Experience
+  * Specialization (Fantasy, Medieval, Modern, Sci-Fi, Spawn Builds, Lobbies, etc.)
+  * Portfolio Gallery
+  * Pricing
+  * Reviews & Ratings
+  * Direct Chat Option
+
+3. 👕 CUSTOM SKIN MAKER
+
+* Add a Custom Skin Creator category.
+* Users can request Minecraft skins based on descriptions or reference images.
+* Include portfolio samples, pricing, reviews, likes, comments, and direct messaging.
+
+4. 💬 ADVANCED CHAT SYSTEM
+
+* Real-time messaging between clients and creators.
+* Typing indicators.
+* Read receipts.
+* File/image sharing.
+* Project discussion area.
+* Mobile-friendly chat interface.
+
+5. 🤖 AI SUPPORT ASSISTANT
+
+* Built-in chatbot to help users navigate the platform.
+* Answer FAQs.
+* Guide users through placing orders.
+* Help creators upload portfolios.
+* Report bugs and issues directly.
+
+6. 🛒 DIGITAL MARKETPLACE
+
+* Premium Mods.
+* Premium Resource Packs.
+* Premium Models.
+* Premium Plugins.
+* Premium Cinematics Assets.
+* Secure checkout and instant downloads after payment.
+
+7. ⭐ CREATOR REVIEWS & RATINGS
+
+* Clients can leave ratings and reviews after completed projects.
+* Display creator reputation score publicly.
+
+8. 🎖️ VERIFIED & PREMIUM BADGES
+
+* Verified Designer Badge.
+* Premium Designer Badge.
+* Top Rated Badge.
+* Founder Badge.
+
+9. 📊 CREATOR DASHBOARD
+
+* Total Orders Completed.
+* Earnings Statistics.
+* Client Reviews.
+* Portfolio Management.
+* Order History.
+
+10. 💎 COMMISSION REQUEST SYSTEM
+
+* Users can describe exactly what they want:
+
+  * Thumbnail
+  * Video Edit
+  * Resource Pack
+  * Mod
+  * Plugin
+  * Cinematic
+  * Build
+  * Custom Skin
+* Creators can send offers and quotations.
+
+11. 🎨 MOD REQUEST SECTION
+
+* Users describe the mod they want.
+* Admin or creators can create/find the requested mod.
+* Premium mod purchasing system.
+
+12. 📱 RESPONSIVE DESIGN
+
+* Fully optimized for:
+
+  * Mobile
+  * Tablet
+  * Desktop
+  * Desktop Site Mode
+* Must work smoothly on all screen sizes.
+
+13. ✨ PREMIUM ANIMATIONS
+
+* Smooth page transitions.
+* Hover animations on cards.
+* Animated buttons.
+* Loading animations.
+* Glowing violet effects.
+* Modern glassmorphism effects.
+* Smooth scrolling.
+* Professional gaming-style UI interactions.
+* Framer Motion style animations throughout the website.
+
+14. 🚀 MONETIZATION FEATURES
+
+* Featured Creator subscriptions.
+* Premium creator listings.
+* Homepage featured spots.
+* Commission fee tracking.
+* Platform commission system.
+* Referral rewards system.
+* Creator subscription plans.
+
+15. 💜 OVERALL DESIGN
+
+* Dark Gaming Theme.
+* Violet Neon Color Palette.
+* Modern Glassmorphism UI.
+* Premium marketplace appearance.
+* Professional and trustworthy feel.
+* High-end gaming startup quality design.
+
+
+
+please make as described above

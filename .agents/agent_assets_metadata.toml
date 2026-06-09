@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "uZZJZypYiVZCR-8s-iWUK"
+uri = "file://artifacts/only-creators/public/avatar-default.png"
+type = "image"
+title = "Default avatar profile"

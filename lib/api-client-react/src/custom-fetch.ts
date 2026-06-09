@@ -44,6 +44,11 @@ export function setAuthTokenGetter(getter: AuthTokenGetter | null): void {
   _authTokenGetter = getter;
 }
 
+// Default to reading from localStorage if running in browser
+if (typeof window !== "undefined") {
+  setAuthTokenGetter(() => localStorage.getItem("auth_token"));
+}
+
 function isRequest(input: RequestInfo | URL): input is Request {
   return typeof Request !== "undefined" && input instanceof Request;
 }

@@ -1,0 +1,2 @@
+- [Only Creators auth](only-creators-auth.md) — custom HMAC token auth; token in localStorage key `auth_token`; custom-fetch auto-attaches it
+- [Only Creators DB raw SQL](only-creators-db-sql.md) — raw SQL via db.execute returns snake_case columns; always handle both camelCase and snake_case in format helpers

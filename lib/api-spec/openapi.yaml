@@ -3,20 +3,31 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Only Creators - Gaming Creator Marketplace API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: auth
+  - name: users
+  - name: creators
+  - name: samples
+  - name: categories
+  - name: likes
+  - name: comments
+  - name: favorites
+  - name: follows
+  - name: requests
+  - name: admin
+  - name: stats
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +35,1036 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # AUTH
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                required: [message]
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  # USERS
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    patch:
+      operationId: updateUser
+      tags: [users]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # CATEGORIES
+  /categories:
+    get:
+      operationId: getCategories
+      tags: [categories]
+      summary: List all categories
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  # CREATOR PROFILES
+  /creators:
+    get:
+      operationId: getCreators
+      tags: [creators]
+      summary: List/search creators
+      parameters:
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer }
+        - name: offset
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CreatorProfile"
+
+  /creators/top:
+    get:
+      operationId: getTopCreators
+      tags: [creators]
+      summary: Get top/most liked creators
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CreatorProfile"
+
+  /creators/featured:
+    get:
+      operationId: getFeaturedCreators
+      tags: [creators]
+      summary: Get featured creators
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CreatorProfile"
+
+  /creators/me:
+    get:
+      operationId: getMyCreatorProfile
+      tags: [creators]
+      summary: Get current user's creator profile
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatorProfile"
+    post:
+      operationId: createCreatorProfile
+      tags: [creators]
+      summary: Create creator profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatorProfileInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatorProfile"
+    patch:
+      operationId: updateCreatorProfile
+      tags: [creators]
+      summary: Update creator profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatorProfileUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatorProfile"
+
+  /creators/{id}:
+    get:
+      operationId: getCreatorById
+      tags: [creators]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatorProfile"
+
+  # SAMPLES
+  /samples:
+    get:
+      operationId: getSamples
+      tags: [samples]
+      summary: List/search samples
+      parameters:
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: game
+          in: query
+          schema: { type: string }
+        - name: budget
+          in: query
+          schema: { type: integer }
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: creatorId
+          in: query
+          schema: { type: integer }
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer }
+        - name: offset
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sample"
+    post:
+      operationId: createSample
+      tags: [samples]
+      summary: Upload a sample
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SampleInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sample"
+
+  /samples/trending:
+    get:
+      operationId: getTrendingSamples
+      tags: [samples]
+      summary: Get trending samples
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sample"
+
+  /samples/recent:
+    get:
+      operationId: getRecentSamples
+      tags: [samples]
+      summary: Get recently added samples
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sample"
+
+  /samples/{id}:
+    get:
+      operationId: getSample
+      tags: [samples]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sample"
+    patch:
+      operationId: updateSample
+      tags: [samples]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SampleUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sample"
+    delete:
+      operationId: deleteSample
+      tags: [samples]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: No Content
+
+  # LIKES
+  /samples/{id}/like:
+    post:
+      operationId: toggleLike
+      tags: [likes]
+      summary: Toggle like on a sample
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LikeStatus"
+
+  # COMMENTS
+  /samples/{id}/comments:
+    get:
+      operationId: getComments
+      tags: [comments]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+    post:
+      operationId: addComment
+      tags: [comments]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+
+  /comments/{id}:
+    delete:
+      operationId: deleteComment
+      tags: [comments]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: No Content
+
+  # FAVORITES
+  /samples/{id}/favorite:
+    post:
+      operationId: toggleFavorite
+      tags: [favorites]
+      summary: Toggle favorite on a sample
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoriteStatus"
+
+  /users/me/favorites:
+    get:
+      operationId: getMyFavorites
+      tags: [favorites]
+      summary: Get my favorited samples
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sample"
+
+  # FOLLOWS
+  /creators/{id}/follow:
+    post:
+      operationId: toggleFollow
+      tags: [follows]
+      summary: Follow/unfollow a creator
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FollowStatus"
+
+  # REQUESTS / REQUEST BOARD
+  /requests:
+    get:
+      operationId: getRequests
+      tags: [requests]
+      summary: List custom requests
+      parameters:
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer }
+        - name: offset
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Request"
+    post:
+      operationId: createRequest
+      tags: [requests]
+      summary: Post a custom request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+
+  /requests/{id}:
+    get:
+      operationId: getRequest
+      tags: [requests]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+
+  # DASHBOARD STATS
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [stats]
+      summary: Get creator dashboard stats
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /home/stats:
+    get:
+      operationId: getHomeStats
+      tags: [stats]
+      summary: Get homepage stats
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HomeStats"
+
+  # ADMIN
+  /admin/samples:
+    get:
+      operationId: adminGetSamples
+      tags: [admin]
+      summary: Admin - list samples with filter
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer }
+        - name: offset
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sample"
+
+  /admin/samples/{id}/approve:
+    post:
+      operationId: approveSample
+      tags: [admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sample"
+
+  /admin/samples/{id}/reject:
+    post:
+      operationId: rejectSample
+      tags: [admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RejectInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sample"
+
+  /admin/users:
+    get:
+      operationId: adminGetUsers
+      tags: [admin]
+      summary: Admin - list users
+      parameters:
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: role
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer }
+        - name: offset
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /admin/users/{id}/ban:
+    post:
+      operationId: banUser
+      tags: [admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /admin/creators/{id}/feature:
+    post:
+      operationId: featureCreator
+      tags: [admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatorProfile"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Admin overview stats
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
 components:
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
-      required:
-        - status
+        status: { type: string }
+      required: [status]
 
+    # AUTH
+    RegisterInput:
+      type: object
+      required: [username, email, password, accountType]
+      properties:
+        username: { type: string, minLength: 3 }
+        email: { type: string }
+        password: { type: string, minLength: 6 }
+        accountType: { type: string, enum: [customer, creator] }
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string }
+        password: { type: string }
+
+    AuthResponse:
+      type: object
+      required: [user, token]
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token: { type: string }
+
+    # USER
+    User:
+      type: object
+      required: [id, username, email, accountType, createdAt]
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        email: { type: string }
+        accountType: { type: string }
+        avatarUrl: { type: ["string", "null"] }
+        bio: { type: ["string", "null"] }
+        role: { type: string }
+        isBanned: { type: boolean }
+        createdAt: { type: string }
+
+    UserUpdate:
+      type: object
+      properties:
+        username: { type: string }
+        bio: { type: string }
+        avatarUrl: { type: string }
+
+    # CATEGORY
+    Category:
+      type: object
+      required: [id, name, slug, icon]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        icon: { type: string }
+        description: { type: ["string", "null"] }
+        sampleCount: { type: integer }
+
+    # CREATOR PROFILE
+    CreatorProfile:
+      type: object
+      required: [id, userId, displayName, createdAt]
+      properties:
+        id: { type: integer }
+        userId: { type: integer }
+        displayName: { type: string }
+        bio: { type: ["string", "null"] }
+        avatarUrl: { type: ["string", "null"] }
+        gmailAddress: { type: ["string", "null"] }
+        discordUsername: { type: ["string", "null"] }
+        servicesOffered: { type: ["string", "null"] }
+        experienceLevel: { type: ["string", "null"] }
+        portfolioUrl: { type: ["string", "null"] }
+        socialLinks: { type: ["string", "null"] }
+        verificationStatus: { type: string }
+        level: { type: string }
+        totalLikes: { type: integer }
+        totalSamples: { type: integer }
+        followerCount: { type: integer }
+        isFeatured: { type: boolean }
+        username: { type: ["string", "null"] }
+        joinedAt: { type: ["string", "null"] }
+        createdAt: { type: string }
+
+    CreatorProfileInput:
+      type: object
+      required: [displayName]
+      properties:
+        displayName: { type: string }
+        bio: { type: string }
+        avatarUrl: { type: string }
+        gmailAddress: { type: string }
+        discordUsername: { type: string }
+        servicesOffered: { type: string }
+        experienceLevel: { type: string }
+        portfolioUrl: { type: string }
+        socialLinks: { type: string }
+
+    CreatorProfileUpdate:
+      type: object
+      properties:
+        displayName: { type: string }
+        bio: { type: string }
+        avatarUrl: { type: string }
+        gmailAddress: { type: string }
+        discordUsername: { type: string }
+        servicesOffered: { type: string }
+        experienceLevel: { type: string }
+        portfolioUrl: { type: string }
+        socialLinks: { type: string }
+
+    # SAMPLE
+    Sample:
+      type: object
+      required: [id, creatorId, title, category, status, createdAt]
+      properties:
+        id: { type: integer }
+        creatorId: { type: integer }
+        title: { type: string }
+        description: { type: ["string", "null"] }
+        category: { type: string }
+        gameType: { type: ["string", "null"] }
+        budget: { type: ["integer", "null"] }
+        previewImageUrl: { type: ["string", "null"] }
+        previewVideoUrl: { type: ["string", "null"] }
+        tags: { type: ["string", "null"] }
+        status: { type: string }
+        likeCount: { type: integer }
+        commentCount: { type: integer }
+        isLiked: { type: boolean }
+        isFavorited: { type: boolean }
+        creatorName: { type: ["string", "null"] }
+        creatorAvatarUrl: { type: ["string", "null"] }
+        creatorVerified: { type: boolean }
+        createdAt: { type: string }
+
+    SampleInput:
+      type: object
+      required: [title, category]
+      properties:
+        title: { type: string }
+        description: { type: string }
+        category: { type: string }
+        gameType: { type: string }
+        budget: { type: integer }
+        previewImageUrl: { type: string }
+        previewVideoUrl: { type: string }
+        tags: { type: string }
+
+    SampleUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string }
+        category: { type: string }
+        gameType: { type: string }
+        budget: { type: integer }
+        previewImageUrl: { type: string }
+        previewVideoUrl: { type: string }
+        tags: { type: string }
+
+    # INTERACTIONS
+    LikeStatus:
+      type: object
+      required: [liked, likeCount]
+      properties:
+        liked: { type: boolean }
+        likeCount: { type: integer }
+
+    FavoriteStatus:
+      type: object
+      required: [favorited]
+      properties:
+        favorited: { type: boolean }
+
+    FollowStatus:
+      type: object
+      required: [following, followerCount]
+      properties:
+        following: { type: boolean }
+        followerCount: { type: integer }
+
+    # COMMENT
+    Comment:
+      type: object
+      required: [id, sampleId, userId, content, createdAt]
+      properties:
+        id: { type: integer }
+        sampleId: { type: integer }
+        userId: { type: integer }
+        content: { type: string }
+        username: { type: ["string", "null"] }
+        avatarUrl: { type: ["string", "null"] }
+        createdAt: { type: string }
+
+    CommentInput:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, minLength: 1 }
+
+    # REQUEST BOARD
+    Request:
+      type: object
+      required: [id, userId, title, category, status, createdAt]
+      properties:
+        id: { type: integer }
+        userId: { type: integer }
+        title: { type: string }
+        description: { type: ["string", "null"] }
+        category: { type: string }
+        gameType: { type: ["string", "null"] }
+        budget: { type: ["integer", "null"] }
+        deadline: { type: ["string", "null"] }
+        referenceImageUrl: { type: ["string", "null"] }
+        status: { type: string }
+        username: { type: ["string", "null"] }
+        createdAt: { type: string }
+
+    RequestInput:
+      type: object
+      required: [title, category]
+      properties:
+        title: { type: string }
+        description: { type: string }
+        category: { type: string }
+        gameType: { type: string }
+        budget: { type: integer }
+        deadline: { type: string }
+        referenceImageUrl: { type: string }
+
+    # STATS
+    DashboardStats:
+      type: object
+      required: [totalSamples, totalLikes, totalComments, totalViews, pendingSamples, approvedSamples]
+      properties:
+        totalSamples: { type: integer }
+        totalLikes: { type: integer }
+        totalComments: { type: integer }
+        totalViews: { type: integer }
+        pendingSamples: { type: integer }
+        approvedSamples: { type: integer }
+
+    HomeStats:
+      type: object
+      required: [totalCreators, totalSamples, totalCategories]
+      properties:
+        totalCreators: { type: integer }
+        totalSamples: { type: integer }
+        totalCategories: { type: integer }
+
+    AdminStats:
+      type: object
+      required: [totalUsers, totalCreators, totalSamples, pendingApprovals, totalLikes]
+      properties:
+        totalUsers: { type: integer }
+        totalCreators: { type: integer }
+        totalSamples: { type: integer }
+        pendingApprovals: { type: integer }
+        totalLikes: { type: integer }
+
+    RejectInput:
+      type: object
+      properties:
+        reason: { type: string }
