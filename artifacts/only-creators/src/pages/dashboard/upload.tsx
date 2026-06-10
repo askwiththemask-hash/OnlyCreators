@@ -224,7 +224,7 @@ export default function DashboardUpload() {
       setError("Please upload a thumbnail image for your work.");
       return;
     }
-    const tagsArray = form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+    const tagsString = form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean).join(",") : undefined;
     const imageServingPath = `/api/storage${thumbnail.objectPath}`;
     const videoServingPath = videoPreview ? `/api/storage${videoPreview.objectPath}` : undefined;
 
@@ -237,7 +237,7 @@ export default function DashboardUpload() {
         budget: form.budget ? parseInt(form.budget, 10) : undefined,
         previewImageUrl: imageServingPath,
         previewVideoUrl: videoServingPath,
-        tags: tagsArray.length > 0 ? tagsArray : undefined,
+        tags: tagsString,
       }
     }, {
       onSuccess: () => {

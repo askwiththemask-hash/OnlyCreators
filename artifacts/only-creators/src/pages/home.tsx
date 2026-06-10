@@ -25,9 +25,14 @@ export default function Home() {
             <Link href="/browse" className="inline-flex items-center justify-center h-12 px-8 rounded-md bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-colors shadow-[0_0_30px_-5px_hsl(var(--primary))]">
               Explore Services
             </Link>
-            <Link href="/register" className="inline-flex items-center justify-center h-12 px-8 rounded-md border border-white/10 bg-black/50 hover:bg-white/5 font-bold transition-colors">
-              Become a Creator
-            </Link>
+            <a
+              href="https://docs.google.com/forms/d/e/1FAIpQLSds-0u86FHTjqDWZuVz5dtkDVR75P3-Dj0OYfFaeVNgKVl2ag/viewform?usp=publish-editor"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center h-12 px-8 rounded-md border border-white/10 bg-black/50 hover:bg-white/5 font-bold transition-colors"
+            >
+              Apply For Creator
+            </a>
           </div>
           
           {stats && (

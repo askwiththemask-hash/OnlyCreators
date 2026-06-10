@@ -1,0 +1,114 @@
+CRITICAL BUG FIXES REQUIRED
+
+1. FIX SAMPLE UPLOAD SUBMISSION ERROR
+
+Current error:
+
+Expected string, received array
+path: ["tags"]
+
+Fix the tags field validation.
+
+Either:
+
+* Accept arrays properly, OR
+* Convert comma-separated tags into a valid string before saving.
+
+Users should be able to submit uploads without validation errors.
+
+The upload form must successfully save samples.
+
+2. ADD ADMIN PANEL (OWNER ONLY)
+
+Create a private admin dashboard accessible only to my account.
+
+Admin features:
+
+* Approve creator applications
+* Approve uploaded samples
+* Delete samples
+* Delete users
+* Edit users
+* View creators
+* Manage marketplace products
+* View reports
+* View analytics
+* View uploaded files
+* Manage categories
+* Manage featured creators
+
+No normal user should be able to access the admin panel.
+
+3. PROFILE PICTURE UPLOAD
+
+Allow users to upload and change:
+
+* Profile Picture
+* Banner Image
+
+Images should be stored permanently and displayed publicly.
+
+4. CHANGE BUTTON TEXT
+
+Replace:
+
+"Become a Creator"
+
+with:
+
+"Apply For Creator"
+
+5. GOOGLE FORM REDIRECT
+
+When "Apply For Creator" is clicked, open:
+
+https://docs.google.com/forms/d/e/1FAIpQLSds-0u86FHTjqDWZuVz5dtkDVR75P3-Dj0OYfFaeVNgKVl2ag/viewform?usp=publish-editor
+
+Open it in a new browser tab.
+
+6. REAL FILE UPLOADS
+
+Ensure uploads actually work.
+
+Creators must be able to upload:
+
+* PNG
+* JPG
+* WEBP
+* MP4
+* ZIP
+
+The files must be saved correctly and displayed publicly.
+
+Do not create fake upload functionality.
+
+7. PROFILE SETTINGS
+
+Allow users to edit:
+
+* Username
+* Display Name
+* Bio
+* Profile Picture
+* Banner
+* Social Links
+* Portfolio Links
+
+Changes should save permanently.
+
+8. FIX ALL SUBMIT BUTTONS
+
+Review all forms and buttons.
+
+Ensure:
+
+* Upload Sample works
+* Save Profile works
+* Create Listing works
+* Submit Review works
+
+No validation errors should block normal usage.
+
+9. FINAL REQUIREMENT
+
+Test the entire upload flow from start to finish and ensure a creator can successfully upload a sample without errors.
