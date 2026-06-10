@@ -162,7 +162,7 @@ router.post("/samples", requireAuth, requireCreator, async (req, res): Promise<v
   const [profile] = await db.select().from(creatorProfilesTable).where(eq(creatorProfilesTable.userId, authUser.id));
   if (!profile) { res.status(400).json({ error: "Creator profile required" }); return; }
 
-  const [sample] = await db.insert(samplesTable).values({ ...parsed.data, creatorId: profile.id, status: "pending" }).returning();
+  const [sample] = await db.insert(samplesTable).values({ ...parsed.data, creatorId: profile.id, status: "approved" }).returning();
   res.status(201).json(formatSample({ ...sample, creator_name: profile.displayName, creator_avatar_url: profile.avatarUrl, creator_verified: profile.verificationStatus !== "normal", is_liked: false, is_favorited: false, like_count: 0, comment_count: 0 }));
 });
 
@@ -181,7 +181,7 @@ router.patch("/samples/:id", requireAuth, async (req, res): Promise<void> => {
     res.status(403).json({ error: "Forbidden" }); return;
   }
 
-  const [sample] = await db.update(samplesTable).set({ ...parsed.data, status: "pending" }).where(eq(samplesTable.id, id)).returning();
+  const [sample] = await db.update(samplesTable).set({ ...parsed.data }).where(eq(samplesTable.id, id)).returning();
   res.json(formatSample({ ...sample, creator_name: null, creator_avatar_url: null, creator_verified: false, is_liked: false, is_favorited: false, like_count: 0, comment_count: 0 }));
 });
 
