@@ -1,0 +1,136 @@
+CRITICAL REPLIT INSTRUCTIONS
+
+1. REMOVE ALL FAKE DATA
+
+* Remove all demo creators.
+* Remove fake chats.
+* Remove fake reviews.
+* Remove fake projects.
+* Remove fake products.
+* Remove placeholder content.
+* Remove hardcoded marketplace listings.
+
+Only display real user-generated content.
+
+If no content exists, show:
+
+* "No creators found"
+* "No samples uploaded yet"
+* "No products available"
+
+instead of fake data.
+
+2. REAL MODS MARKETPLACE
+
+Create a dedicated Mods Marketplace.
+
+Features:
+
+* Upload Mods
+* Sell Mods
+* Free Mods
+* Premium Mods
+* Mod Categories
+* Mod Search
+* Mod Reviews
+* Mod Ratings
+* Version Information
+* Download Counter
+
+Each mod page should include:
+
+* Thumbnail
+* Description
+* Screenshots
+* Supported Versions
+* Price
+* Download Button
+* Creator Profile
+
+3. DIRECT FILE UPLOAD SYSTEM
+
+Creators must be able to upload files directly from their device.
+
+Supported file types:
+
+Images:
+
+* PNG
+* JPG
+* WEBP
+
+Videos:
+
+* MP4
+
+Archives:
+
+* ZIP
+* RAR
+
+Documents:
+
+* PDF
+
+The upload system must allow drag-and-drop and file picker uploads.
+
+4. SAMPLE UPLOAD SYSTEM
+
+Creators should be able to upload portfolio samples directly from local files.
+
+Each sample should support:
+
+* Thumbnail
+* Gallery Images
+* Video Preview
+* Title
+* Description
+* Category
+* Price
+
+Uploaded files must be stored permanently and displayed publicly.
+
+5. REAL DATABASE STORAGE
+
+Do not use temporary memory.
+
+Store:
+
+* Users
+* Creator Profiles
+* Samples
+* Products
+* Mods
+* Reviews
+* Messages
+
+inside a real database.
+
+Data must persist after server restarts.
+
+6. CREATOR DASHBOARD
+
+Creators should be able to:
+
+* Upload Samples
+* Upload Mods
+* Edit Listings
+* Change Prices
+* View Reviews
+* Manage Files
+
+7. SECURITY
+
+Only logged-in users can:
+
+* Upload files
+* Chat
+* Buy products
+* Leave reviews
+* Create listings
+
+8. FINAL GOAL
+
+Build a real marketplace similar to BuiltByBit and Fiverr for gaming creators.
+
+Prioritize functionality and real uploads over demo content and fake marketplace data.
