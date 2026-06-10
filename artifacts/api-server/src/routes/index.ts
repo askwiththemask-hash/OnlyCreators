@@ -10,6 +10,7 @@ import requestsRouter from "./requests";
 import statsRouter from "./stats";
 import adminRouter from "./admin";
 import storageRouter from "./storage";
+import messagesRouter from "./messages";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(requestsRouter);
 router.use(statsRouter);
 router.use(adminRouter);
 router.use(storageRouter);
+router.use(messagesRouter);
 
 export default router;

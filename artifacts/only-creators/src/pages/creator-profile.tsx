@@ -12,7 +12,7 @@ export default function CreatorProfile() {
   const creatorId = parseInt(id, 10);
   const { isLoggedIn } = useAuth();
 
-  const { data: creator, isLoading } = useGetCreatorById({ id: creatorId });
+  const { data: creator, isLoading } = useGetCreatorById(creatorId);
   const { data: samples } = useGetSamples({ creatorId: creatorId.toString() });
   const toggleFollow = useToggleFollow();
 

@@ -7,3 +7,4 @@ export * from "./favorites";
 export * from "./follows";
 export * from "./requests";
 export * from "./categories";
+export * from "./messages";

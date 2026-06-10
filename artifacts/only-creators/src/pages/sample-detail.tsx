@@ -124,9 +124,9 @@ export default function SampleDetail() {
               <p className="text-muted-foreground leading-relaxed mb-8">{sample.description}</p>
             )}
 
-            {sample.tags && sample.tags.length > 0 && (
+            {sample.tags && (
               <div className="flex flex-wrap gap-2 mb-8">
-                {sample.tags.map((tag) => (
+                {String(sample.tags).split(",").map(t => t.trim()).filter(Boolean).map((tag) => (
                   <span key={tag} className="text-xs px-3 py-1 rounded-full bg-white/5 text-muted-foreground">#{tag}</span>
                 ))}
               </div>

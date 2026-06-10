@@ -22,6 +22,8 @@ import NewRequest from "@/pages/requests/new";
 import Admin from "@/pages/admin/index";
 import AdminSamples from "@/pages/admin/samples";
 import AdminUsers from "@/pages/admin/users";
+import Messages from "@/pages/messages";
+import Mods from "@/pages/mods";
 
 function Router() {
   return (
@@ -30,25 +32,27 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/browse" component={Browse} />
+      <Route path="/mods" component={Mods} />
       <Route path="/category/:slug" component={Category} />
       <Route path="/sample/:id" component={SampleDetail} />
       <Route path="/creator/:id" component={CreatorProfile} />
       <Route path="/profile" component={UserProfile} />
-      
+      <Route path="/messages" component={Messages} />
+
       {/* Dashboard Routes */}
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/dashboard/upload" component={DashboardUpload} />
       <Route path="/dashboard/profile" component={DashboardProfile} />
-      
+
       {/* Requests */}
       <Route path="/requests" component={Requests} />
       <Route path="/requests/new" component={NewRequest} />
-      
+
       {/* Admin */}
       <Route path="/admin" component={Admin} />
       <Route path="/admin/samples" component={AdminSamples} />
       <Route path="/admin/users" component={AdminUsers} />
-      
+
       <Route component={NotFound} />
     </Switch>
   );
