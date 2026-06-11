@@ -1,0 +1,150 @@
+CRITICAL MARKETPLACE FEATURE FIXES
+
+1. SAMPLE DETAILS PAGE
+
+Currently when a user clicks on a sample, the website shows:
+
+"Sample Not Found"
+
+This must be fixed.
+
+When a sample is opened, it should display a complete sample page containing:
+
+* Sample Title
+* Sample Thumbnail
+* Full Description
+* Category
+* Game Type
+* Tags
+* Price
+* Upload Date
+* Download Count (if applicable)
+
+Most importantly show:
+
+Created By:
+[Creator Username]
+
+The creator name should be clickable and redirect to the creator's public profile.
+
+2. CREATOR PROFILE LINKING
+
+Every sample must be linked to its creator.
+
+Clicking on the creator name should open the creator's profile showing:
+
+* Profile Picture
+* Banner
+* Bio
+* Categories
+* Reviews
+* Followers
+* Uploaded Samples
+* Average Rating
+* Social Links
+
+3. FULLY WORKING LIKE SYSTEM
+
+Add a real like system.
+
+Users should be able to:
+
+* Like a sample
+* Remove their like
+
+Requirements:
+
+* Prevent duplicate likes
+* Save likes in database
+* Display total like count
+* Update instantly without page refresh
+
+4. FULLY WORKING COMMENT SYSTEM
+
+Add a real comment section below every sample.
+
+Users should be able to:
+
+* Post comments
+* Edit their comments
+* Delete their own comments
+
+Display:
+
+* Username
+* Profile Picture
+* Comment Date
+* Comment Content
+
+Comments must be stored permanently.
+
+5. FULLY WORKING REVIEW SYSTEM
+
+Add a review system.
+
+Users can leave:
+
+* Star Rating (1-5)
+* Written Review
+
+Display:
+
+* Average Rating
+* Total Reviews
+* Individual Reviews
+
+Reviews must be saved in database.
+
+6. FOLLOW SYSTEM
+
+The Follow button currently does not function properly.
+
+Create a fully working follow system.
+
+Users should be able to:
+
+* Follow creators
+* Unfollow creators
+
+Display:
+
+* Followers Count
+* Following Count
+
+Followers should update in real time.
+
+7. NOTIFICATIONS
+
+Add notifications for:
+
+* New Follower
+* New Comment
+* New Review
+* New Like
+
+Users should receive notifications inside their account.
+
+8. DATABASE INTEGRATION
+
+Ensure Likes, Comments, Reviews, Followers and Sample Data are all connected to the real database.
+
+Data must remain after:
+
+* Refreshing the page
+* Logging out
+* Restarting the server
+
+9. PROFESSIONAL UI
+
+The sample details page should look like a professional marketplace similar to:
+
+* Fiverr
+* BuiltByBit
+* Behance
+* ArtStation
+
+No blank pages.
+No "Sample Not Found" errors.
+No placeholder content.
+
+Everything must be fully functional and connected to real data.

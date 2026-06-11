@@ -1,14 +1,19 @@
 import { Router, type IRouter } from "express";
-import { db, usersTable, likesTable, favoritesTable, followsTable, commentsTable, samplesTable } from "@workspace/db";
+import { db, usersTable, likesTable, favoritesTable, followsTable, commentsTable, samplesTable, reviewsTable, notificationsTable, creatorProfilesTable } from "@workspace/db";
 import { eq, sql, and } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
 import { AddCommentBody } from "@workspace/api-zod";
 
 const router: IRouter = Router();
-
 type AnyUser = typeof usersTable.$inferSelect;
 
-// LIKES
+async function createNotif(userId: number, type: string, message: string, actorId?: number, actorUsername?: string, sampleId?: number) {
+  try {
+    await db.insert(notificationsTable).values({ userId, type, message, actorId: actorId ?? null, actorUsername: actorUsername ?? null, sampleId: sampleId ?? null });
+  } catch { /* non-critical */ }
+}
+
+// ─── LIKES ────────────────────────────────────────────────────────────────────
 router.post("/samples/:id/like", requireAuth, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const sampleId = parseInt(raw, 10);
@@ -22,13 +27,21 @@ router.post("/samples/:id/like", requireAuth, async (req, res): Promise<void> =>
     await db.delete(likesTable).where(and(eq(likesTable.userId, authUser.id), eq(likesTable.sampleId, sampleId)));
   } else {
     await db.insert(likesTable).values({ userId: authUser.id, sampleId });
+    // Notify sample owner
+    const [sample] = await db.select().from(samplesTable).where(eq(samplesTable.id, sampleId));
+    if (sample) {
+      const [cp] = await db.select().from(creatorProfilesTable).where(eq(creatorProfilesTable.id, sample.creatorId));
+      if (cp && cp.userId !== authUser.id) {
+        await createNotif(cp.userId, "like", `${authUser.username} liked your sample`, authUser.id, authUser.username, sampleId);
+      }
+    }
   }
 
-  const [countResult] = await db.execute(sql`SELECT COUNT(*)::int as count FROM likes WHERE sample_id = ${sampleId}`) as { rows: Array<{ count: number }> };
-  res.json({ liked: existing.length === 0, likeCount: countResult?.count ?? 0 });
+  const [r] = await db.execute(sql`SELECT COUNT(*)::int as count FROM likes WHERE sample_id = ${sampleId}`) as { rows: Array<{ count: number }> };
+  res.json({ liked: existing.length === 0, likeCount: r?.count ?? 0 });
 });
 
-// COMMENTS
+// ─── COMMENTS ─────────────────────────────────────────────────────────────────
 router.get("/samples/:id/comments", async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const sampleId = parseInt(raw, 10);
@@ -38,7 +51,7 @@ router.get("/samples/:id/comments", async (req, res): Promise<void> => {
     FROM comments c
     JOIN users u ON u.id = c.user_id
     WHERE c.sample_id = ${sampleId}
-    ORDER BY c.created_at DESC
+    ORDER BY c.created_at ASC
   `);
   res.json((result as { rows: Array<Record<string, unknown>> }).rows.map(r => ({
     id: r.id,
@@ -60,14 +73,20 @@ router.post("/samples/:id/comments", requireAuth, async (req, res): Promise<void
   if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
 
   const [comment] = await db.insert(commentsTable).values({ sampleId, userId: authUser.id, content: parsed.data.content }).returning();
+
+  // Notify sample owner
+  const [sample] = await db.select().from(samplesTable).where(eq(samplesTable.id, sampleId));
+  if (sample) {
+    const [cp] = await db.select().from(creatorProfilesTable).where(eq(creatorProfilesTable.id, sample.creatorId));
+    if (cp && cp.userId !== authUser.id) {
+      await createNotif(cp.userId, "comment", `${authUser.username} commented on your sample`, authUser.id, authUser.username, sampleId);
+    }
+  }
+
   res.status(201).json({
-    id: comment.id,
-    sampleId: comment.sampleId,
-    userId: comment.userId,
-    content: comment.content,
-    username: authUser.username,
-    avatarUrl: authUser.avatarUrl ?? null,
-    createdAt: comment.createdAt.toISOString(),
+    id: comment.id, sampleId: comment.sampleId, userId: comment.userId,
+    content: comment.content, username: authUser.username,
+    avatarUrl: authUser.avatarUrl ?? null, createdAt: comment.createdAt.toISOString(),
   });
 });
 
@@ -78,15 +97,75 @@ router.delete("/comments/:id", requireAuth, async (req, res): Promise<void> => {
 
   const [comment] = await db.select().from(commentsTable).where(eq(commentsTable.id, id));
   if (!comment) { res.status(404).json({ error: "Comment not found" }); return; }
-  if (comment.userId !== authUser.id && authUser.role !== "admin") {
-    res.status(403).json({ error: "Forbidden" }); return;
-  }
+  if (comment.userId !== authUser.id && authUser.role !== "admin") { res.status(403).json({ error: "Forbidden" }); return; }
 
   await db.delete(commentsTable).where(eq(commentsTable.id, id));
   res.sendStatus(204);
 });
 
-// FAVORITES
+// ─── REVIEWS ──────────────────────────────────────────────────────────────────
+router.get("/samples/:id/reviews", async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const sampleId = parseInt(raw, 10);
+
+  const result = await db.execute(sql`
+    SELECT r.*, u.username, u.avatar_url
+    FROM reviews r
+    JOIN users u ON u.id = r.user_id
+    WHERE r.sample_id = ${sampleId}
+    ORDER BY r.created_at DESC
+  `);
+  const rows = (result as { rows: Array<Record<string, unknown>> }).rows;
+  const reviews = rows.map(r => ({
+    id: r.id, sampleId: r.sample_id, userId: r.user_id,
+    rating: r.rating, content: r.content ?? null,
+    username: r.username ?? null, avatarUrl: r.avatar_url ?? null,
+    createdAt: typeof r.created_at === "string" ? r.created_at : (r.created_at as Date)?.toISOString?.() ?? null,
+  }));
+  const avg = reviews.length ? reviews.reduce((a, r) => a + Number(r.rating), 0) / reviews.length : null;
+  res.json({ reviews, average: avg ? Math.round(avg * 10) / 10 : null, total: reviews.length });
+});
+
+router.post("/samples/:id/reviews", requireAuth, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const sampleId = parseInt(raw, 10);
+  const authUser = (req as typeof req & { user: AnyUser }).user;
+  const { rating, content } = req.body as { rating?: number; content?: string };
+
+  if (!rating || rating < 1 || rating > 5) { res.status(400).json({ error: "Rating must be 1-5" }); return; }
+
+  const existing = await db.select().from(reviewsTable).where(
+    and(eq(reviewsTable.userId, authUser.id), eq(reviewsTable.sampleId, sampleId))
+  );
+  let review;
+  if (existing.length > 0) {
+    [review] = await db.update(reviewsTable)
+      .set({ rating, content: content?.trim() || null, updatedAt: new Date() })
+      .where(and(eq(reviewsTable.userId, authUser.id), eq(reviewsTable.sampleId, sampleId)))
+      .returning();
+  } else {
+    [review] = await db.insert(reviewsTable).values({ sampleId, userId: authUser.id, rating, content: content?.trim() || null }).returning();
+    // Notify sample owner
+    const [sample] = await db.select().from(samplesTable).where(eq(samplesTable.id, sampleId));
+    if (sample) {
+      const [cp] = await db.select().from(creatorProfilesTable).where(eq(creatorProfilesTable.id, sample.creatorId));
+      if (cp && cp.userId !== authUser.id) {
+        await createNotif(cp.userId, "review", `${authUser.username} left a ${rating}★ review on your sample`, authUser.id, authUser.username, sampleId);
+      }
+    }
+  }
+  res.status(existing.length ? 200 : 201).json({ ...review, username: authUser.username });
+});
+
+router.delete("/samples/:id/reviews", requireAuth, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const sampleId = parseInt(raw, 10);
+  const authUser = (req as typeof req & { user: AnyUser }).user;
+  await db.delete(reviewsTable).where(and(eq(reviewsTable.userId, authUser.id), eq(reviewsTable.sampleId, sampleId)));
+  res.sendStatus(204);
+});
+
+// ─── FAVORITES ────────────────────────────────────────────────────────────────
 router.post("/samples/:id/favorite", requireAuth, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const sampleId = parseInt(raw, 10);
@@ -105,7 +184,7 @@ router.post("/samples/:id/favorite", requireAuth, async (req, res): Promise<void
   }
 });
 
-// FOLLOWS
+// ─── FOLLOWS ──────────────────────────────────────────────────────────────────
 router.post("/creators/:id/follow", requireAuth, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const creatorId = parseInt(raw, 10);
@@ -119,10 +198,15 @@ router.post("/creators/:id/follow", requireAuth, async (req, res): Promise<void>
     await db.delete(followsTable).where(and(eq(followsTable.followerId, authUser.id), eq(followsTable.creatorId, creatorId)));
   } else {
     await db.insert(followsTable).values({ followerId: authUser.id, creatorId });
+    // Notify creator
+    const [cp] = await db.select().from(creatorProfilesTable).where(eq(creatorProfilesTable.id, creatorId));
+    if (cp && cp.userId !== authUser.id) {
+      await createNotif(cp.userId, "follow", `${authUser.username} started following you`, authUser.id, authUser.username);
+    }
   }
 
-  const [countResult] = await db.execute(sql`SELECT COUNT(*)::int as count FROM follows WHERE creator_id = ${creatorId}`) as { rows: Array<{ count: number }> };
-  res.json({ following: existing.length === 0, followerCount: countResult?.count ?? 0 });
+  const [r] = await db.execute(sql`SELECT COUNT(*)::int as count FROM follows WHERE creator_id = ${creatorId}`) as { rows: Array<{ count: number }> };
+  res.json({ following: existing.length === 0, followerCount: r?.count ?? 0 });
 });
 
 export default router;

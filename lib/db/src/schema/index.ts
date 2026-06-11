@@ -8,3 +8,5 @@ export * from "./follows";
 export * from "./requests";
 export * from "./categories";
 export * from "./messages";
+export * from "./reviews";
+export * from "./notifications";

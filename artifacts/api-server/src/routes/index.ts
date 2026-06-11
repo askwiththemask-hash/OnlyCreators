@@ -11,6 +11,7 @@ import statsRouter from "./stats";
 import adminRouter from "./admin";
 import storageRouter from "./storage";
 import messagesRouter from "./messages";
+import notificationsRouter from "./notifications";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(statsRouter);
 router.use(adminRouter);
 router.use(storageRouter);
 router.use(messagesRouter);
+router.use(notificationsRouter);
 
 export default router;
