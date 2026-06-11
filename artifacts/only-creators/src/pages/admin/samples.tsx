@@ -7,7 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useAuth } from "@/hooks/use-auth";
+
+function getToken() { return localStorage.getItem("auth_token"); }
+
+async function adminDeleteSample(id: number): Promise<void> {
+  const token = getToken();
+  const r = await fetch(`/api/admin/samples/${id}`, {
+    method: "DELETE",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!r.ok && r.status !== 204) {
+    const text = await r.text().catch(() => "Unknown error");
+    throw new Error(text || `Failed to delete (${r.status})`);
+  }
+}
 
 export default function AdminSamples() {
   const { isAdmin } = useAuth();
@@ -15,6 +30,10 @@ export default function AdminSamples() {
   const { data: samples, isLoading } = useAdminGetSamples({ status: statusFilter });
   const approveSample = useApproveSample();
   const rejectSample = useRejectSample();
+
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   if (!isAdmin) {
     return (
@@ -39,14 +58,47 @@ export default function AdminSamples() {
     });
   };
 
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await adminDeleteSample(deleteTarget.id);
+      queryClient.invalidateQueries({ queryKey: ["adminGetSamples"] });
+      setDeleteTarget(null);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete. Please try again.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <MainLayout>
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        title="Delete Sample (Admin)"
+        message={`Permanently delete "${deleteTarget?.title}"? This removes it from the database and deletes all associated files from storage.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => { setDeleteTarget(null); setDeleteError(null); }}
+        loading={deleting}
+      />
+
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <div className="flex items-center gap-3 mb-8">
           <Link href="/admin" className="text-muted-foreground hover:text-foreground transition-colors">Admin</Link>
           <span className="text-muted-foreground">/</span>
           <h1 className="font-bold text-xl">Sample Management</h1>
         </div>
+
+        {deleteError && (
+          <div className="mb-4 p-3 rounded-xl border border-destructive/30 bg-destructive/10 text-destructive text-sm flex items-center justify-between">
+            <span>❌ {deleteError}</span>
+            <button onClick={() => setDeleteError(null)} className="ml-3 font-bold text-destructive/60 hover:text-destructive">✕</button>
+          </div>
+        )}
 
         <Tabs value={statusFilter} onValueChange={setStatusFilter}>
           <TabsList className="mb-6">
@@ -90,6 +142,13 @@ export default function AdminSamples() {
                       <Link href={`/sample/${sample.id}`}>
                         <Button variant="ghost" size="sm">View</Button>
                       </Link>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => setDeleteTarget({ id: sample.id, title: sample.title })}
+                      >
+                        🗑
+                      </Button>
                     </div>
                   </div>
                 ))}

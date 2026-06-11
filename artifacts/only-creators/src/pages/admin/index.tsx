@@ -56,11 +56,11 @@ export default function Admin() {
         </div>
 
         {/* Quick actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link href="/admin/samples" className="group block rounded-2xl border border-white/10 bg-card p-8 hover:border-primary/40 transition-all">
             <div className="text-4xl mb-4">📁</div>
             <h2 className="text-xl font-bold group-hover:text-primary transition-colors mb-2">Sample Management</h2>
-            <p className="text-muted-foreground text-sm">Review, approve, and reject creator samples. Manage content quality.</p>
+            <p className="text-muted-foreground text-sm">Review, approve, reject, and delete creator samples.</p>
             {(stats?.pendingApprovals ?? 0) > 0 && (
               <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/20 text-yellow-400 text-sm font-semibold">
                 ⏳ {stats?.pendingApprovals} pending
@@ -71,7 +71,13 @@ export default function Admin() {
           <Link href="/admin/users" className="group block rounded-2xl border border-white/10 bg-card p-8 hover:border-primary/40 transition-all">
             <div className="text-4xl mb-4">👥</div>
             <h2 className="text-xl font-bold group-hover:text-primary transition-colors mb-2">User Management</h2>
-            <p className="text-muted-foreground text-sm">View all users, manage creator verification, ban/unban accounts.</p>
+            <p className="text-muted-foreground text-sm">View all users, manage verification, ban/unban accounts.</p>
+          </Link>
+
+          <Link href="/admin/pins" className="group block rounded-2xl border border-white/10 bg-card p-8 hover:border-primary/40 transition-all">
+            <div className="text-4xl mb-4">🔐</div>
+            <h2 className="text-xl font-bold group-hover:text-primary transition-colors mb-2">Creator PINs</h2>
+            <p className="text-muted-foreground text-sm">View all creator PINs, usage status, and linked accounts.</p>
           </Link>
         </div>
       </div>

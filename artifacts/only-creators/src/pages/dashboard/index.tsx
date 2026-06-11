@@ -1,10 +1,27 @@
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useGetMyCreatorProfile, useGetDashboardStats, useGetSamples } from "@workspace/api-client-react";
+import { queryClient } from "@/lib/query-client";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useAuth } from "@/hooks/use-auth";
+
+function getToken() { return localStorage.getItem("auth_token"); }
+
+async function deleteSample(id: number): Promise<void> {
+  const token = getToken();
+  const r = await fetch(`/api/samples/${id}`, {
+    method: "DELETE",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!r.ok && r.status !== 204) {
+    const text = await r.text().catch(() => "Unknown error");
+    throw new Error(text || `Failed to delete sample (${r.status})`);
+  }
+}
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -12,6 +29,10 @@ export default function Dashboard() {
   const { data: profile, isLoading: profileLoading } = useGetMyCreatorProfile();
   const { data: stats } = useGetDashboardStats();
   const { data: mySamples } = useGetSamples({ creatorId: profile?.id?.toString(), status: "all" } as Parameters<typeof useGetSamples>[0]);
+
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   if (authLoading || profileLoading) {
     return (
@@ -46,12 +67,34 @@ export default function Dashboard() {
     { label: "Pending Review", value: stats?.pendingSamples ?? 0, icon: "⏳", color: "from-yellow-500/20 to-yellow-500/5" },
   ];
 
-  const pendingSamples = mySamples?.filter(s => s.status === "pending") ?? [];
-  const approvedSamples = mySamples?.filter(s => s.status === "approved") ?? [];
-  const rejectedSamples = mySamples?.filter(s => s.status === "rejected") ?? [];
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteSample(deleteTarget.id);
+      queryClient.invalidateQueries({ queryKey: ["getSamples"] });
+      setDeleteTarget(null);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete. Please try again.");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <MainLayout>
+      <ConfirmDialog
+        isOpen={!!deleteTarget}
+        title="Delete Sample"
+        message={`Are you sure you want to delete "${deleteTarget?.title}"? This will permanently remove the sample and all associated files from storage. This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => { setDeleteTarget(null); setDeleteError(null); }}
+        loading={deleting}
+      />
+
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -101,6 +144,14 @@ export default function Dashboard() {
           </Link>
         </div>
 
+        {/* Delete error */}
+        {deleteError && (
+          <div className="mb-4 p-3 rounded-xl border border-destructive/30 bg-destructive/10 text-destructive text-sm flex items-center justify-between">
+            <span>❌ {deleteError}</span>
+            <button onClick={() => setDeleteError(null)} className="text-destructive/60 hover:text-destructive ml-3 font-bold">✕</button>
+          </div>
+        )}
+
         {/* My Works */}
         <div>
           <h2 className="text-xl font-bold mb-4">My Works</h2>
@@ -131,6 +182,14 @@ export default function Dashboard() {
                   <Link href={`/sample/${sample.id}`}>
                     <Button variant="ghost" size="sm">View</Button>
                   </Link>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setDeleteTarget({ id: sample.id, title: sample.title })}
+                    className="flex-shrink-0"
+                  >
+                    🗑 Delete
+                  </Button>
                 </div>
               ))}
             </div>

@@ -57,7 +57,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
   }).returning();
 
   if (accountType === "creator" && creatorPin) {
-    await db.update(creatorPinsTable).set({ used: true }).where(eq(creatorPinsTable.pin, creatorPin));
+    await db.update(creatorPinsTable).set({ used: true, usedByUserId: user.id }).where(eq(creatorPinsTable.pin, creatorPin));
   }
 
   const token = signToken(user.id);

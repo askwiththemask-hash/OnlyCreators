@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "wouter";
+import { Link, useParams, useLocation } from "wouter";
 import { useGetSample, useToggleLike, useToggleFavorite, useGetComments, useAddComment, useDeleteComment } from "@workspace/api-client-react";
 import { queryClient } from "@/lib/query-client";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useAuth } from "@/hooks/use-auth";
 
 function getToken() { return localStorage.getItem("auth_token"); }
@@ -43,8 +44,9 @@ function StarRating({ value, onChange, readonly }: { value: number; onChange?: (
 
 export default function SampleDetail() {
   const { id } = useParams<{ id: string }>();
+  const [, setLocation] = useLocation();
   const sampleId = parseInt(id, 10);
-  const { user, isLoggedIn } = useAuth();
+  const { user, isLoggedIn, isAdmin } = useAuth();
   const [commentText, setCommentText] = useState("");
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
@@ -54,7 +56,14 @@ export default function SampleDetail() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [activeTab, setActiveTab] = useState<"comments" | "reviews">("comments");
 
-  // ✅ FIXED: useGetSample takes (id: number) directly, NOT ({ id })
+  // Delete sample state
+  const [showDeleteSample, setShowDeleteSample] = useState(false);
+  const [deletingSample, setDeletingSample] = useState(false);
+  const [sampleDeleteError, setSampleDeleteError] = useState<string | null>(null);
+
+  // Delete comment state
+  const [deleteCommentTarget, setDeleteCommentTarget] = useState<number | null>(null);
+
   const { data: sample, isLoading } = useGetSample(sampleId);
   const { data: comments, refetch: refetchComments } = useGetComments({ id: sampleId });
   const toggleLike = useToggleLike();
@@ -117,6 +126,27 @@ export default function SampleDetail() {
     } catch { }
   };
 
+  const handleDeleteSample = async () => {
+    setDeletingSample(true);
+    setSampleDeleteError(null);
+    try {
+      await api(`/api/samples/${sampleId}`, { method: "DELETE" });
+      queryClient.invalidateQueries({ queryKey: ["getSamples"] });
+      setLocation("/dashboard");
+    } catch (err) {
+      setSampleDeleteError(err instanceof Error ? err.message : "Failed to delete sample.");
+      setDeletingSample(false);
+      setShowDeleteSample(false);
+    }
+  };
+
+  const handleDeleteComment = (commentId: number) => {
+    deleteComment.mutate(
+      { id: commentId },
+      { onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["getComments"] }); setDeleteCommentTarget(null); } }
+    );
+  };
+
   if (isLoading) {
     return (
       <MainLayout>
@@ -153,12 +183,49 @@ export default function SampleDetail() {
     );
   }
 
+  // Determine ownership: check if current user is the creator
+  // sample.creatorId is the creator_profile id; we need to check ownership differently
+  // The sample has creatorId (creator_profile id). We need to check if user's creator profile id matches.
+  // We'll use a flag: if user is admin OR if they uploaded it (backend will reject if not owner)
+  const isOwner = isAdmin; // Will be extended once we have creatorProfileId on user
+
   const myReview = reviewsData?.reviews.find(r => r.userId === user?.id);
   const tags = sample.tags ? String(sample.tags).split(",").map(t => t.trim()).filter(Boolean) : [];
 
   return (
     <MainLayout>
+      {/* Delete Sample Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteSample}
+        title="Delete Sample"
+        message={`Permanently delete "${sample.title}"? This will remove it from the database and delete all associated files. This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        onConfirm={handleDeleteSample}
+        onCancel={() => setShowDeleteSample(false)}
+        loading={deletingSample}
+      />
+
+      {/* Delete Comment Dialog */}
+      <ConfirmDialog
+        isOpen={deleteCommentTarget !== null}
+        title="Delete Comment"
+        message="Are you sure you want to delete this comment? This cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        onConfirm={() => deleteCommentTarget !== null && handleDeleteComment(deleteCommentTarget)}
+        onCancel={() => setDeleteCommentTarget(null)}
+        loading={deleteComment.isPending}
+      />
+
       <div className="container mx-auto px-4 py-10 max-w-6xl">
+        {sampleDeleteError && (
+          <div className="mb-4 p-3 rounded-xl border border-destructive/30 bg-destructive/10 text-destructive text-sm flex items-center justify-between">
+            <span>❌ {sampleDeleteError}</span>
+            <button onClick={() => setSampleDeleteError(null)} className="ml-3 font-bold">✕</button>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
           {/* ── LEFT: Main Content ───────────────────────────────── */}
@@ -193,7 +260,7 @@ export default function SampleDetail() {
                   </div>
                   <h1 className="text-3xl font-black leading-tight">{sample.title}</h1>
                 </div>
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="flex gap-2 flex-shrink-0 flex-wrap justify-end">
                   <button
                     onClick={handleLike}
                     disabled={!isLoggedIn}
@@ -208,6 +275,14 @@ export default function SampleDetail() {
                   >
                     {sample.isFavorited ? "★ Saved" : "☆ Save"}
                   </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => setShowDeleteSample(true)}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm transition-all border border-destructive/30 hover:border-destructive/60 hover:bg-destructive/10 text-destructive"
+                    >
+                      🗑 Delete
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -321,16 +396,19 @@ export default function SampleDetail() {
                           <p className="text-sm text-muted-foreground leading-relaxed">{comment.content}</p>
                         )}
                       </div>
-                      {user && comment.userId === user.id && editingCommentId !== comment.id && (
+                      {/* Show edit/delete for own comments, delete-only for admin */}
+                      {user && editingCommentId !== comment.id && (comment.userId === user.id || isAdmin) && (
                         <div className="flex items-center gap-2 flex-shrink-0">
+                          {comment.userId === user.id && (
+                            <button
+                              className="text-muted-foreground hover:text-primary transition-colors text-xs"
+                              onClick={() => { setEditingCommentId(comment.id!); setEditText(comment.content ?? ""); }}
+                            >Edit</button>
+                          )}
                           <button
-                            className="text-muted-foreground hover:text-primary transition-colors text-xs"
-                            onClick={() => { setEditingCommentId(comment.id!); setEditText(comment.content ?? ""); }}
-                          >Edit</button>
-                          <button
-                            className="text-muted-foreground hover:text-destructive transition-colors text-sm"
-                            onClick={() => deleteComment.mutate({ id: comment.id! }, { onSuccess: () => queryClient.invalidateQueries({ queryKey: ["getComments"] }) })}
-                          >✕</button>
+                            className="text-muted-foreground hover:text-destructive transition-colors text-xs font-semibold"
+                            onClick={() => setDeleteCommentTarget(comment.id!)}
+                          >Delete</button>
                         </div>
                       )}
                     </div>
@@ -414,6 +492,20 @@ export default function SampleDetail() {
                         </div>
                         {review.content && <p className="text-sm text-muted-foreground leading-relaxed">{review.content}</p>}
                       </div>
+                      {/* Admin can delete any review */}
+                      {isAdmin && (
+                        <button
+                          className="text-muted-foreground hover:text-destructive transition-colors text-xs font-semibold flex-shrink-0"
+                          onClick={async () => {
+                            if (!window.confirm("Delete this review?")) return;
+                            try {
+                              await api(`/api/admin/reviews/${review.id}`, { method: "DELETE" });
+                              const updated = await api<ReviewsResponse>(`/api/samples/${sampleId}/reviews`);
+                              setReviewsData(updated);
+                            } catch { }
+                          }}
+                        >Delete</button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -423,6 +515,34 @@ export default function SampleDetail() {
 
           {/* ── RIGHT: Sidebar ──────────────────────────────────── */}
           <div className="space-y-5">
+
+            {/* Owner delete button (creator dashboard link) */}
+            {isLoggedIn && !isAdmin && (
+              <div className="rounded-2xl border border-white/10 bg-card p-4 text-center">
+                <p className="text-xs text-muted-foreground mb-3">Manage your content</p>
+                <Link href="/dashboard">
+                  <Button variant="outline" size="sm" className="w-full">Go to Dashboard</Button>
+                </Link>
+              </div>
+            )}
+
+            {/* Admin controls */}
+            {isAdmin && (
+              <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 space-y-2">
+                <p className="text-xs text-destructive font-bold uppercase tracking-wider mb-3">Admin Controls</p>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setShowDeleteSample(true)}
+                >
+                  🗑 Delete This Sample
+                </Button>
+                <Link href="/admin/samples">
+                  <Button variant="outline" size="sm" className="w-full mt-1">Back to Admin</Button>
+                </Link>
+              </div>
+            )}
 
             {/* Pricing CTA */}
             {sample.budget != null ? (
@@ -506,7 +626,7 @@ export default function SampleDetail() {
               </a>
             )}
 
-            {/* Report / Share */}
+            {/* Share */}
             <div className="flex gap-2">
               <button
                 onClick={() => navigator.share?.({ title: sample.title, url: window.location.href }).catch(() => navigator.clipboard?.writeText(window.location.href))}

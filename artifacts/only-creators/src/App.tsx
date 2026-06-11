@@ -22,6 +22,7 @@ import NewRequest from "@/pages/requests/new";
 import Admin from "@/pages/admin/index";
 import AdminSamples from "@/pages/admin/samples";
 import AdminUsers from "@/pages/admin/users";
+import AdminPins from "@/pages/admin/pins";
 import Messages from "@/pages/messages";
 import Mods from "@/pages/mods";
 import Saved from "@/pages/saved";
@@ -54,6 +55,7 @@ function Router() {
       <Route path="/admin" component={Admin} />
       <Route path="/admin/samples" component={AdminSamples} />
       <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/pins" component={AdminPins} />
 
       <Route component={NotFound} />
     </Switch>

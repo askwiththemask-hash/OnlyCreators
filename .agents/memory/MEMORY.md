@@ -1,3 +1,5 @@
 - [Only Creators auth](only-creators-auth.md) — custom HMAC token auth; token in localStorage key `auth_token`; custom-fetch auto-attaches it
 - [Only Creators DB raw SQL](only-creators-db-sql.md) — raw SQL via db.execute returns snake_case columns; always handle both camelCase and snake_case in format helpers
 - [Only Creators object storage](only-creators-object-storage.md) — GCS presigned URL uploads; upload endpoint requires auth token passed manually (not through custom-fetch)
+- [Only Creators deletion system](only-creators-deletion.md) — ownership-verified DELETE endpoints with GCS file cleanup; ConfirmDialog component at components/ui/ConfirmDialog.tsx
+- [Only Creators creator pins](only-creators-creator-pins.md) — 20 official PINs in DB; usedByUserId column tracks linked account; admin endpoint GET /api/admin/pins

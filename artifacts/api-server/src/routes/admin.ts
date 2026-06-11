@@ -1,8 +1,11 @@
 import { Router, type IRouter } from "express";
-import { db, usersTable, samplesTable, creatorProfilesTable } from "@workspace/db";
+import { db, usersTable, samplesTable, creatorProfilesTable, creatorPinsTable, reviewsTable } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import { requireAuth, requireAdmin } from "../middlewares/auth";
 import { RejectSampleBody } from "@workspace/api-zod";
+import { ObjectStorageService } from "../lib/objectStorage";
+
+const storageService = new ObjectStorageService();
 
 const router: IRouter = Router();
 
@@ -141,6 +144,51 @@ router.post("/admin/creators/:id/feature", requireAuth, requireAdmin, async (req
     joinedAt: null,
     createdAt: profile.createdAt.toISOString(),
   });
+});
+
+router.delete("/admin/samples/:id", requireAuth, requireAdmin, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const [existing] = await db.select().from(samplesTable).where(eq(samplesTable.id, id));
+  if (!existing) { res.status(404).json({ error: "Sample not found" }); return; }
+
+  const filesToDelete = [existing.fileUrl, existing.previewImageUrl, existing.previewVideoUrl].filter(Boolean) as string[];
+  await Promise.allSettled(filesToDelete.map(url => {
+    const path = storageService.normalizeObjectEntityPath(url);
+    if (path.startsWith("/objects/")) return storageService.deleteObjectEntity(path);
+    return Promise.resolve();
+  }));
+
+  await db.delete(samplesTable).where(eq(samplesTable.id, id));
+  res.sendStatus(204);
+});
+
+router.delete("/admin/reviews/:id", requireAuth, requireAdmin, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const [existing] = await db.select().from(reviewsTable).where(eq(reviewsTable.id, id));
+  if (!existing) { res.status(404).json({ error: "Review not found" }); return; }
+  await db.delete(reviewsTable).where(eq(reviewsTable.id, id));
+  res.sendStatus(204);
+});
+
+router.get("/admin/pins", requireAuth, requireAdmin, async (_req, res): Promise<void> => {
+  const result = await db.execute(sql`
+    SELECT cp.pin, cp.used, cp.used_by_user_id, cp.created_at,
+           u.username as used_by_username, u.email as used_by_email
+    FROM creator_pins cp
+    LEFT JOIN users u ON u.id = cp.used_by_user_id
+    ORDER BY cp.used ASC, cp.pin ASC
+  `);
+  const rows = (result as { rows: Array<Record<string, unknown>> }).rows;
+  res.json(rows.map(r => ({
+    pin: r.pin,
+    used: r.used,
+    usedByUserId: r.used_by_user_id ?? null,
+    usedByUsername: r.used_by_username ?? null,
+    usedByEmail: r.used_by_email ?? null,
+    createdAt: typeof r.created_at === "string" ? r.created_at : (r.created_at as Date)?.toISOString?.() ?? null,
+  })));
 });
 
 router.get("/admin/stats", requireAuth, requireAdmin, async (_req, res): Promise<void> => {

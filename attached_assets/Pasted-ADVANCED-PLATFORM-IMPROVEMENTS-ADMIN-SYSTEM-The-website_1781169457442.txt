@@ -1,0 +1,317 @@
+ADVANCED PLATFORM IMPROVEMENTS & ADMIN SYSTEM
+
+The website is improving, but several important systems are still missing or incomplete. Implement the following exactly as described.
+
+====================================
+
+1. OWNER-ONLY ADMIN PANEL
+   ====================================
+
+Create a private Admin Panel that ONLY my account can access.
+
+Access Method:
+
+* Open my profile
+* Click "Admin Panel"
+
+No other user should see this button.
+
+Admin abilities:
+
+* View all users
+* View all creators
+* View all orders
+* View all uploaded samples
+* View all reviews
+* View all comments
+* View all messages
+* View all reports
+
+Admin controls:
+
+* Delete any sample
+* Delete any comment
+* Delete any review
+* Delete any message
+* Delete any account
+* Suspend users
+* Ban users
+* Feature creators
+* Approve creators
+
+====================================
+2. CREATOR TIERS
+================
+
+Admin can manually assign creator tiers:
+
+* Beginner
+* Intermediate
+* Advanced
+* Expert
+* Legendary
+
+Tier should appear publicly on creator profiles.
+
+====================================
+3. CREATOR PIN SYSTEM
+=====================
+
+The website should only support 20 creator PINs total.
+
+Rules:
+
+* PIN must be exactly 6 digits.
+* Numbers only.
+* Each PIN can only be used ONCE.
+* After a PIN is used, it becomes permanently unavailable.
+
+Only users with a valid unused PIN can register as creators.
+
+====================================
+4. SEARCH FIXES
+===============
+
+Chat search currently does not work.
+
+Fix search functionality.
+
+Search should work for:
+
+* Users
+* Messages
+* Creators
+* Samples
+* Marketplace Products
+
+Results should update instantly.
+
+====================================
+5. COMMENTS SYSTEM
+==================
+
+Comments must be fully functional.
+
+Requirements:
+
+* Post comments
+* Edit comments
+* Delete own comments
+* Show profile picture
+* Show username
+* Show timestamp
+
+Comments must display correctly on sample pages.
+
+====================================
+6. LIKE SYSTEM
+==============
+
+Likes must work instantly.
+
+When a user clicks Like:
+
+* Like count increases immediately
+* Smooth animation plays
+* Database updates
+
+When unliked:
+
+* Count decreases immediately
+* Animation plays
+
+Prevent duplicate likes.
+
+====================================
+7. SAVE SYSTEM
+==============
+
+Save/Bookmark system must work.
+
+When Save is clicked:
+
+* Save count updates instantly
+* Animation plays
+* Data saves permanently
+
+Users can view saved content later.
+
+====================================
+8. COMMON SENSE RESTRICTIONS
+============================
+
+Prevent abuse.
+
+Users must NOT be able to:
+
+* Like their own content
+* Review their own content
+* Follow themselves
+* Message themselves
+* Review the same item multiple times
+
+Validate all actions.
+
+====================================
+9. INTERNAL WEBSITE MESSAGING
+=============================
+
+Do NOT open external applications.
+
+When Message is clicked:
+
+* Open internal website chat
+* Open conversation page
+* Allow real-time messaging
+
+Features:
+
+* Real-time messages
+* Typing indicators
+* Read receipts
+* Online status
+* File sharing
+* Image sharing
+
+Everything must happen inside the website.
+
+====================================
+10. FILE UPLOAD FIXES
+=====================
+
+Currently file uploads are missing for some categories.
+
+Mod Developer:
+
+* ZIP Upload
+* JAR Upload
+* Image Upload
+
+Plugin Development:
+
+* ZIP Upload
+* JAR Upload
+* Image Upload
+
+Resource Packs:
+
+* ZIP Upload
+* Image Upload
+
+The upload options must actually appear.
+
+====================================
+11. EXPERIENCE-BASED CATEGORIES
+===============================
+
+Building Category:
+
+Instead of file uploads, use:
+
+* Experience
+* Portfolio Images
+* Portfolio Videos
+* Description
+
+Recording Manager:
+
+Instead of file uploads, use:
+
+* Experience
+* Portfolio Videos
+* Portfolio Images
+* Portfolio URLs
+
+====================================
+12. COMING SOON PLACEHOLDERS
+============================
+
+If there are no uploads yet for:
+
+* Building
+* Plugin Development
+* Mod Development
+
+Show:
+
+"COMING SOON"
+
+instead of broken pages or errors.
+
+====================================
+13. MORE LIKE THIS SECTION
+==========================
+
+When viewing a sample, show:
+
+"More Like This"
+
+Display related samples from:
+
+* Same category
+* Similar tags
+* Same creator type
+
+====================================
+14. MOD MARKETPLACE IMPROVEMENTS
+================================
+
+Mods Marketplace is separate from creator categories.
+
+When a mod is opened:
+
+Replace:
+
+"Hire Creator"
+
+with:
+
+"Buy Mod"
+
+When Buy Mod is clicked:
+
+Open creator profile so users can contact the creator.
+
+====================================
+15. PROFILE VISIBILITY
+======================
+
+Profile pictures must display everywhere.
+
+Show profile picture on:
+
+* Creator profile
+* Comments
+* Reviews
+* Messages
+* Followers list
+* Search results
+* Sample pages
+
+The uploaded profile picture should be visible to all users.
+
+====================================
+16. DATABASE VALIDATION
+=======================
+
+Verify that:
+
+* Likes save correctly
+* Saves save correctly
+* Comments save correctly
+* Reviews save correctly
+* Followers save correctly
+* Messages save correctly
+* Orders save correctly
+* Creator PIN usage saves correctly
+
+All data must persist after:
+
+* Refresh
+* Logout
+* Login
+* Server Restart
+
+Do not create fake UI.
+
+Every feature must be fully functional, database-driven, and production-ready.

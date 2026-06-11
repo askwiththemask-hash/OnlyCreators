@@ -1,178 +1,158 @@
 import { Router, type IRouter } from "express";
-import { db, usersTable, creatorProfilesTable, samplesTable } from "@workspace/db";
-import { eq, sql, desc } from "drizzle-orm";
-import { requireAuth, requireCreator, optionalAuth } from "../middlewares/auth";
+import { db, samplesTable, creatorProfilesTable, likesTable, commentsTable, reviewsTable } from "@workspace/db";
+import { eq, and, desc, or, ilike, sql, inArray } from "drizzle-orm";
+import { requireAuth } from "../middlewares/auth";
 import { CreateSampleBody, UpdateSampleBody } from "@workspace/api-zod";
+import { ObjectStorageService } from "../lib/objectStorage";
+import type { AnyUser } from "../middlewares/auth";
 
 const router: IRouter = Router();
+const storageService = new ObjectStorageService();
 
-type AnyUser = typeof usersTable.$inferSelect;
-
-function formatSample(r: Record<string, unknown>): unknown {
+function formatSample(r: Record<string, unknown>) {
   return {
     id: r.id,
-    creatorId: r.creator_id,
+    creatorId: r.creator_id ?? r.creatorId,
     title: r.title,
     description: r.description ?? null,
     category: r.category,
-    gameType: r.game_type ?? null,
+    gameType: r.game_type ?? r.gameType ?? null,
     budget: r.budget ?? null,
-    previewImageUrl: r.preview_image_url ?? null,
-    previewVideoUrl: r.preview_video_url ?? null,
-    fileUrl: r.file_url ?? null,
+    previewImageUrl: r.preview_image_url ?? r.previewImageUrl ?? null,
+    previewVideoUrl: r.preview_video_url ?? r.previewVideoUrl ?? null,
+    fileUrl: r.file_url ?? r.fileUrl ?? null,
     tags: r.tags ?? null,
     status: r.status,
-    likeCount: Number(r.like_count ?? 0),
-    commentCount: Number(r.comment_count ?? 0),
-    isLiked: r.is_liked === true || r.is_liked === "true" || r.is_liked === 1,
-    isFavorited: r.is_favorited === true || r.is_favorited === "true" || r.is_favorited === 1,
-    creatorName: r.creator_name ?? null,
-    creatorAvatarUrl: r.creator_avatar_url ?? null,
-    creatorVerified: r.creator_verified === true || r.creator_verified === "true" || r.creator_verified === 1,
+    likeCount: Number(r.like_count ?? r.likeCount ?? 0),
+    commentCount: Number(r.comment_count ?? r.commentCount ?? 0),
+    isLiked: r.is_liked === true || r.is_liked === "true" || r.isLiked === true,
+    isFavorited: r.is_favorited === true || r.is_favorited === "true" || r.isFavorited === true,
+    creatorName: r.creator_name ?? r.creatorName ?? null,
+    creatorAvatarUrl: r.creator_avatar_url ?? r.creatorAvatarUrl ?? null,
+    creatorVerified: r.creator_verified === true || r.creator_verified === "true",
     createdAt: typeof r.created_at === "string" ? r.created_at : (r.created_at as Date)?.toISOString?.() ?? null,
   };
 }
 
-router.get("/samples", optionalAuth, async (req, res): Promise<void> => {
-  const { category, game, budget, search, creatorId, status = "approved", limit = "20", offset = "0" } = req.query as Record<string, string>;
-  const userId = ((req as typeof req & { user?: AnyUser }).user)?.id ?? null;
+router.get("/samples", async (req, res): Promise<void> => {
+  const { category, gameType, search, creatorId, status, limit = "20", offset = "0", featured } = req.query as Record<string, string>;
   const lim = Math.min(parseInt(limit, 10) || 20, 100);
   const off = parseInt(offset, 10) || 0;
 
+  let userId: number | undefined;
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    try {
+      const { verifyToken } = await import("../middlewares/auth");
+      const payload = verifyToken(authHeader.slice(7));
+      userId = payload?.userId;
+    } catch { /* anonymous */ }
+  }
+
   const conditions: string[] = [];
-  const statuses = status === "all" ? ["pending", "approved", "rejected"] : [status];
-  conditions.push(`s.status = ANY(ARRAY[${statuses.map(s => `'${s}'`).join(",")}])`);
   if (category) conditions.push(`s.category = '${category.replace(/'/g, "''")}'`);
-  if (game) conditions.push(`s.game_type = '${game.replace(/'/g, "''")}'`);
-  if (budget) conditions.push(`s.budget <= ${parseInt(budget, 10)}`);
+  if (gameType) conditions.push(`s.game_type = '${gameType.replace(/'/g, "''")}'`);
   if (search) conditions.push(`(s.title ILIKE '%${search.replace(/'/g, "''")}%' OR s.description ILIKE '%${search.replace(/'/g, "''")}%')`);
   if (creatorId) conditions.push(`s.creator_id = ${parseInt(creatorId, 10)}`);
+  if (status === "all" && creatorId) { /* show all statuses for own profile */ }
+  else if (status && status !== "all") conditions.push(`s.status = '${status.replace(/'/g, "''")}'`);
+  else conditions.push(`s.status = 'approved'`);
+  if (featured === "true") conditions.push(`cp.is_featured = true`);
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-  const isLikedSql = userId ? `EXISTS(SELECT 1 FROM likes l2 WHERE l2.user_id = ${userId} AND l2.sample_id = s.id)` : "FALSE";
-  const isFavSql = userId ? `EXISTS(SELECT 1 FROM favorites fv WHERE fv.user_id = ${userId} AND fv.sample_id = s.id)` : "FALSE";
+  const likedJoin = userId
+    ? `LEFT JOIN likes ul ON ul.sample_id = s.id AND ul.user_id = ${userId}`
+    : "";
+  const favJoin = userId
+    ? `LEFT JOIN favorites uf ON uf.sample_id = s.id AND uf.user_id = ${userId}`
+    : "";
 
-  const query = `
+  const result = await db.execute(sql.raw(`
     SELECT s.*,
-      cp.display_name as creator_name, cp.avatar_url as creator_avatar_url,
+      cp.display_name as creator_name,
+      cp.avatar_url as creator_avatar_url,
       cp.verification_status != 'normal' as creator_verified,
-      ${isLikedSql} as is_liked,
-      ${isFavSql} as is_favorited,
       COUNT(DISTINCT l.id)::int as like_count,
       COUNT(DISTINCT c.id)::int as comment_count
+      ${userId ? ", (ul.id IS NOT NULL)::boolean as is_liked" : ", false::boolean as is_liked"}
+      ${userId ? ", (uf.id IS NOT NULL)::boolean as is_favorited" : ", false::boolean as is_favorited"}
     FROM samples s
     JOIN creator_profiles cp ON cp.id = s.creator_id
     LEFT JOIN likes l ON l.sample_id = s.id
     LEFT JOIN comments c ON c.sample_id = s.id
+    ${likedJoin}
+    ${favJoin}
     ${where}
-    GROUP BY s.id, cp.display_name, cp.avatar_url, cp.verification_status
+    GROUP BY s.id, cp.display_name, cp.avatar_url, cp.verification_status ${userId ? ", ul.id, uf.id" : ""}
     ORDER BY s.created_at DESC
     LIMIT ${lim} OFFSET ${off}
-  `;
-  const result = await db.execute(sql.raw(query));
-  res.json((result as { rows: Array<Record<string, unknown>> }).rows.map(formatSample));
-});
-
-router.get("/samples/trending", optionalAuth, async (req, res): Promise<void> => {
-  const { limit = "10" } = req.query as Record<string, string>;
-  const lim = Math.min(parseInt(limit, 10) || 10, 50);
-  const userId = ((req as typeof req & { user?: AnyUser }).user)?.id ?? null;
-  const isLikedSql = userId ? `EXISTS(SELECT 1 FROM likes l2 WHERE l2.user_id = ${userId} AND l2.sample_id = s.id)` : "FALSE";
-  const isFavSql = userId ? `EXISTS(SELECT 1 FROM favorites fv WHERE fv.user_id = ${userId} AND fv.sample_id = s.id)` : "FALSE";
-
-  const result = await db.execute(sql.raw(`
-    SELECT s.*,
-      cp.display_name as creator_name, cp.avatar_url as creator_avatar_url,
-      cp.verification_status != 'normal' as creator_verified,
-      ${isLikedSql} as is_liked,
-      ${isFavSql} as is_favorited,
-      COUNT(DISTINCT l.id)::int as like_count,
-      COUNT(DISTINCT c.id)::int as comment_count
-    FROM samples s
-    JOIN creator_profiles cp ON cp.id = s.creator_id
-    LEFT JOIN likes l ON l.sample_id = s.id
-    LEFT JOIN comments c ON c.sample_id = s.id
-    WHERE s.status = 'approved'
-    GROUP BY s.id, cp.display_name, cp.avatar_url, cp.verification_status
-    ORDER BY like_count DESC, s.created_at DESC
-    LIMIT ${lim}
   `));
+
   res.json((result as { rows: Array<Record<string, unknown>> }).rows.map(formatSample));
 });
 
-router.get("/samples/recent", optionalAuth, async (req, res): Promise<void> => {
-  const { limit = "10" } = req.query as Record<string, string>;
-  const lim = Math.min(parseInt(limit, 10) || 10, 50);
-  const userId = ((req as typeof req & { user?: AnyUser }).user)?.id ?? null;
-  const isLikedSql = userId ? `EXISTS(SELECT 1 FROM likes l2 WHERE l2.user_id = ${userId} AND l2.sample_id = s.id)` : "FALSE";
-  const isFavSql = userId ? `EXISTS(SELECT 1 FROM favorites fv WHERE fv.user_id = ${userId} AND fv.sample_id = s.id)` : "FALSE";
-
-  const result = await db.execute(sql.raw(`
-    SELECT s.*,
-      cp.display_name as creator_name, cp.avatar_url as creator_avatar_url,
-      cp.verification_status != 'normal' as creator_verified,
-      ${isLikedSql} as is_liked,
-      ${isFavSql} as is_favorited,
-      COUNT(DISTINCT l.id)::int as like_count,
-      COUNT(DISTINCT c.id)::int as comment_count
-    FROM samples s
-    JOIN creator_profiles cp ON cp.id = s.creator_id
-    LEFT JOIN likes l ON l.sample_id = s.id
-    LEFT JOIN comments c ON c.sample_id = s.id
-    WHERE s.status = 'approved'
-    GROUP BY s.id, cp.display_name, cp.avatar_url, cp.verification_status
-    ORDER BY s.created_at DESC
-    LIMIT ${lim}
-  `));
-  res.json((result as { rows: Array<Record<string, unknown>> }).rows.map(formatSample));
-});
-
-router.get("/samples/:id", optionalAuth, async (req, res): Promise<void> => {
+router.get("/samples/:id", async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const id = parseInt(raw, 10);
-  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
-  const userId = ((req as typeof req & { user?: AnyUser }).user)?.id ?? null;
-  const isLikedSql = userId ? `EXISTS(SELECT 1 FROM likes l2 WHERE l2.user_id = ${userId} AND l2.sample_id = s.id)` : "FALSE";
-  const isFavSql = userId ? `EXISTS(SELECT 1 FROM favorites fv WHERE fv.user_id = ${userId} AND fv.sample_id = s.id)` : "FALSE";
+
+  let userId: number | undefined;
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    try {
+      const { verifyToken } = await import("../middlewares/auth");
+      const payload = verifyToken(authHeader.slice(7));
+      userId = payload?.userId;
+    } catch { /* anonymous */ }
+  }
+
+  const likedJoin = userId ? `LEFT JOIN likes ul ON ul.sample_id = s.id AND ul.user_id = ${userId}` : "";
+  const favJoin = userId ? `LEFT JOIN favorites uf ON uf.sample_id = s.id AND uf.user_id = ${userId}` : "";
 
   const result = await db.execute(sql.raw(`
     SELECT s.*,
-      cp.display_name as creator_name, cp.avatar_url as creator_avatar_url,
+      cp.display_name as creator_name,
+      cp.avatar_url as creator_avatar_url,
       cp.verification_status != 'normal' as creator_verified,
-      ${isLikedSql} as is_liked,
-      ${isFavSql} as is_favorited,
       COUNT(DISTINCT l.id)::int as like_count,
       COUNT(DISTINCT c.id)::int as comment_count
+      ${userId ? ", (ul.id IS NOT NULL)::boolean as is_liked" : ", false::boolean as is_liked"}
+      ${userId ? ", (uf.id IS NOT NULL)::boolean as is_favorited" : ", false::boolean as is_favorited"}
     FROM samples s
     JOIN creator_profiles cp ON cp.id = s.creator_id
     LEFT JOIN likes l ON l.sample_id = s.id
     LEFT JOIN comments c ON c.sample_id = s.id
+    ${likedJoin}
+    ${favJoin}
     WHERE s.id = ${id}
-    GROUP BY s.id, cp.display_name, cp.avatar_url, cp.verification_status
+    GROUP BY s.id, cp.display_name, cp.avatar_url, cp.verification_status ${userId ? ", ul.id, uf.id" : ""}
+    LIMIT 1
   `));
+
   const rows = (result as { rows: Array<Record<string, unknown>> }).rows;
-  if (!rows.length) { res.status(404).json({ error: "Sample not found" }); return; }
+  if (!rows.length) { res.status(404).json({ error: "Not found" }); return; }
   res.json(formatSample(rows[0]));
 });
 
-router.post("/samples", requireAuth, requireCreator, async (req, res): Promise<void> => {
-  const authUser = (req as typeof req & { user: AnyUser }).user;
+router.post("/samples", requireAuth, async (req, res): Promise<void> => {
   const parsed = CreateSampleBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
+  const authUser = (req as typeof req & { user: AnyUser }).user;
 
   const [profile] = await db.select().from(creatorProfilesTable).where(eq(creatorProfilesTable.userId, authUser.id));
-  if (!profile) { res.status(400).json({ error: "Creator profile required" }); return; }
+  if (!profile) { res.status(403).json({ error: "Creator profile required" }); return; }
 
-  const { fileUrl } = req.body as { fileUrl?: string };
-  const [sample] = await db.insert(samplesTable).values({ ...parsed.data, ...(fileUrl ? { fileUrl } : {}), creatorId: profile.id, status: "approved" }).returning();
-  res.status(201).json(formatSample({ ...sample, creator_name: profile.displayName, creator_avatar_url: profile.avatarUrl, creator_verified: profile.verificationStatus !== "normal", is_liked: false, is_favorited: false, like_count: 0, comment_count: 0 }));
+  const [sample] = await db.insert(samplesTable).values({
+    creatorId: profile.id,
+    ...parsed.data,
+  }).returning();
+
+  res.status(201).json(formatSample({ ...sample, creator_name: null, creator_avatar_url: null, creator_verified: false, is_liked: false, is_favorited: false, like_count: 0, comment_count: 0 }));
 });
 
 router.patch("/samples/:id", requireAuth, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const id = parseInt(raw, 10);
   const authUser = (req as typeof req & { user: AnyUser }).user;
-
   const parsed = UpdateSampleBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
 
@@ -198,6 +178,14 @@ router.delete("/samples/:id", requireAuth, async (req, res): Promise<void> => {
   if (authUser.role !== "admin" && (!profile || existing.creatorId !== profile.id)) {
     res.status(403).json({ error: "Forbidden" }); return;
   }
+
+  // Clean up associated files from object storage (fire and forget errors)
+  const filesToDelete = [existing.fileUrl, existing.previewImageUrl, existing.previewVideoUrl].filter(Boolean) as string[];
+  await Promise.allSettled(filesToDelete.map(url => {
+    const path = storageService.normalizeObjectEntityPath(url);
+    if (path.startsWith("/objects/")) return storageService.deleteObjectEntity(path);
+    return Promise.resolve();
+  }));
 
   await db.delete(samplesTable).where(eq(samplesTable.id, id));
   res.sendStatus(204);
