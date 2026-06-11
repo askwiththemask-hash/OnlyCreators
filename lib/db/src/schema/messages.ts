@@ -4,7 +4,9 @@ export const messagesTable = pgTable("messages", {
   id: serial("id").primaryKey(),
   senderId: integer("sender_id").notNull(),
   recipientId: integer("recipient_id").notNull(),
-  content: text("content").notNull(),
+  content: text("content").notNull().default(""),
+  fileUrl: text("file_url"),
+  fileType: text("file_type"),
   isRead: boolean("is_read").default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
