@@ -1,0 +1,306 @@
+CRITICAL PLATFORM FUNCTIONALITY FIXES
+
+The website UI looks much better now, but many core marketplace features are still not actually working.
+
+I need these features to be FULLY FUNCTIONAL and connected to the real database.
+
+---
+
+1. COMMENTS SYSTEM
+
+---
+
+The comments section currently does not work properly.
+
+Requirements:
+
+* Users can post comments.
+* Users can edit their own comments.
+* Users can delete their own comments.
+* Comments must save in the database.
+* Comments must remain after refresh.
+* Comments must display profile picture, username and timestamp.
+* Real-time comment updates preferred.
+
+---
+
+2. LIKE SYSTEM
+
+---
+
+Likes must be fully functional.
+
+Requirements:
+
+* Like button works.
+* Unlike button works.
+* Prevent duplicate likes.
+* Store likes in database.
+* Show total like count.
+* Update instantly.
+
+---
+
+3. SAVE / BOOKMARK SYSTEM
+
+---
+
+Add a fully working Save feature.
+
+Requirements:
+
+* Users can save samples.
+* Users can remove saved samples.
+* Saved samples appear in a dedicated Saved section.
+* Data stored permanently.
+
+---
+
+4. FOLLOW SYSTEM
+
+---
+
+Follow system must be fully operational.
+
+Requirements:
+
+* Follow creator.
+* Unfollow creator.
+* Followers count updates.
+* Following count updates.
+* Save data permanently.
+
+---
+
+5. WEBSITE MESSAGING SYSTEM
+
+---
+
+Do NOT open external apps.
+
+When users click Messages:
+
+* Open an internal messaging page.
+* Display conversations.
+* Display contacts.
+* Real-time chat.
+* Read receipts.
+* Typing indicators.
+* Image sharing.
+* File sharing.
+
+Everything should happen inside the website.
+
+No external applications should open.
+
+---
+
+6. DIFFERENT UPLOAD UIs
+
+---
+
+Currently all upload pages use the same upload system.
+
+Create separate upload forms for each category.
+
+Thumbnail Designing:
+
+* Image Upload Only
+* No Video Upload
+
+Video Editing:
+
+* Video Upload Allowed
+* Image Upload Allowed
+
+Mod Developer:
+
+* ZIP Upload
+* JAR Upload
+* Image Upload
+* No Video Upload
+
+Plugin Development:
+
+* ZIP Upload
+* JAR Upload
+* Image Upload
+* No Video Upload
+
+Minecraft Builds:
+
+* World File Upload
+* Image Upload
+
+Each category should have its own upload fields.
+
+---
+
+7. MODS & PLUGINS FILE UPLOADS
+
+---
+
+Currently mods and plugins do not allow actual file uploads.
+
+Requirements:
+
+Mod Developer:
+
+* Upload ZIP
+* Upload JAR
+* Upload Images
+
+Plugin Developer:
+
+* Upload ZIP
+* Upload JAR
+* Upload Images
+
+The uploaded file should be downloadable later.
+
+---
+
+8. ORDER MANAGEMENT
+
+---
+
+Orders currently cannot be interacted with properly.
+
+Requirements:
+
+When a creator receives an order:
+
+* Click order
+* Open order details page
+* Show client information
+* Show requirements
+* Show attachments
+* Show price
+* Show status
+
+Designer-only actions:
+
+* Accept Order
+* Reject Order
+* Mark In Progress
+* Mark Completed
+
+Only creators/designers should see these controls.
+
+---
+
+9. CREATOR PIN SYSTEM
+
+---
+
+Add a Creator PIN requirement.
+
+When registering as a creator:
+
+Required fields:
+
+* Username
+* Email
+* Password
+* Creator PIN
+
+Rules:
+
+* PIN must be exactly 6 digits.
+* Less than 6 digits = invalid.
+* More than 6 digits = invalid.
+* Only numbers allowed.
+
+Example:
+123456
+
+Creators without a valid PIN cannot register as creators.
+
+I will manually provide Creator PINs to approved creators.
+
+PIN validation must be enforced.
+
+---
+
+10. CATEGORY STRUCTURE FIX
+
+---
+
+Do NOT use a category called:
+
+"Mods"
+
+Replace it with:
+
+"Mod Developer"
+
+Categories should be:
+
+* Thumbnail Designing
+* Video Editing
+* GFX Design
+* VFX Design
+* Minecraft Builds
+* Mod Developer
+* Plugin Development
+* Resource Packs
+* Cinematics
+* Custom Skins
+* Server Setup
+* Custom Requests
+
+---
+
+11. SEPARATE MOD MARKETPLACE
+
+---
+
+The Mods Marketplace should be completely separate from creator categories.
+
+Creator Category:
+Mod Developer
+
+Marketplace Section:
+Mods Marketplace
+
+These are different things.
+
+Mods Marketplace should contain:
+
+* Free Mods
+* Premium Mods
+* Download Button
+* Reviews
+* Ratings
+* Screenshots
+* File Downloads
+
+Do not mix creator categories with marketplace products.
+
+---
+
+12. DATABASE VERIFICATION
+
+---
+
+Verify that all systems actually save data:
+
+* Comments
+* Likes
+* Saves
+* Followers
+* Messages
+* Orders
+* Creator Pins
+* Uploaded Files
+
+All data must remain after:
+
+* Refresh
+* Logout
+* Login
+* Server Restart
+
+Do not create fake UI elements.
+
+Every feature must be fully functional and connected to the real database.

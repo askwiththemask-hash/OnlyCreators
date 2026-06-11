@@ -46,6 +46,8 @@ export default function SampleDetail() {
   const sampleId = parseInt(id, 10);
   const { user, isLoggedIn } = useAuth();
   const [commentText, setCommentText] = useState("");
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editText, setEditText] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [reviewsData, setReviewsData] = useState<ReviewsResponse | null>(null);
@@ -82,6 +84,16 @@ export default function SampleDetail() {
     addComment.mutate({ id: sampleId, data: { content: commentText } }, {
       onSuccess: () => { setCommentText(""); queryClient.invalidateQueries({ queryKey: ["getComments"] }); },
     });
+  };
+
+  const handleEditComment = async (commentId: number) => {
+    if (!editText.trim()) return;
+    try {
+      await api(`/api/comments/${commentId}`, { method: "PATCH", body: JSON.stringify({ content: editText.trim() }) });
+      queryClient.invalidateQueries({ queryKey: ["getComments"] });
+      setEditingCommentId(null);
+      setEditText("");
+    } catch { }
   };
 
   const handleReview = async (e: React.FormEvent) => {
@@ -285,13 +297,41 @@ export default function SampleDetail() {
                           <span className="text-sm font-semibold">{comment.username ?? "User"}</span>
                           <span className="text-xs text-muted-foreground">{new Date(comment.createdAt!).toLocaleDateString()}</span>
                         </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{comment.content}</p>
+                        {editingCommentId === comment.id ? (
+                          <div className="space-y-2 mt-1">
+                            <textarea
+                              className="w-full text-sm bg-white/5 border border-white/10 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-primary/50 text-foreground"
+                              rows={2}
+                              value={editText}
+                              onChange={e => setEditText(e.target.value)}
+                              autoFocus
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
+                                onClick={() => handleEditComment(comment.id!)}
+                              >Save</button>
+                              <button
+                                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                                onClick={() => { setEditingCommentId(null); setEditText(""); }}
+                              >Cancel</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground leading-relaxed">{comment.content}</p>
+                        )}
                       </div>
-                      {user && comment.userId === user.id && (
-                        <button
-                          className="text-muted-foreground hover:text-destructive transition-colors text-sm flex-shrink-0"
-                          onClick={() => deleteComment.mutate({ id: comment.id! }, { onSuccess: () => queryClient.invalidateQueries({ queryKey: ["getComments"] }) })}
-                        >✕</button>
+                      {user && comment.userId === user.id && editingCommentId !== comment.id && (
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <button
+                            className="text-muted-foreground hover:text-primary transition-colors text-xs"
+                            onClick={() => { setEditingCommentId(comment.id!); setEditText(comment.content ?? ""); }}
+                          >Edit</button>
+                          <button
+                            className="text-muted-foreground hover:text-destructive transition-colors text-sm"
+                            onClick={() => deleteComment.mutate({ id: comment.id! }, { onSuccess: () => queryClient.invalidateQueries({ queryKey: ["getComments"] }) })}
+                          >✕</button>
+                        </div>
                       )}
                     </div>
                   ))}
@@ -452,6 +492,19 @@ export default function SampleDetail() {
                 <span className="font-semibold">{sample.createdAt ? new Date(sample.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—"}</span>
               </div>
             </div>
+
+            {/* Download File */}
+            {(sample as typeof sample & { fileUrl?: string | null }).fileUrl && (
+              <a
+                href={(sample as typeof sample & { fileUrl?: string | null }).fileUrl!}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:border-emerald-500/60 hover:bg-emerald-500/20 transition-all font-semibold text-sm"
+              >
+                ⬇️ Download File
+              </a>
+            )}
 
             {/* Report / Share */}
             <div className="flex gap-2">

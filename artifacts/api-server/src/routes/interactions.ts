@@ -90,6 +90,22 @@ router.post("/samples/:id/comments", requireAuth, async (req, res): Promise<void
   });
 });
 
+router.patch("/comments/:id", requireAuth, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const authUser = (req as typeof req & { user: AnyUser }).user;
+  const { content } = req.body as { content?: string };
+
+  if (!content?.trim()) { res.status(400).json({ error: "Content required" }); return; }
+
+  const [comment] = await db.select().from(commentsTable).where(eq(commentsTable.id, id));
+  if (!comment) { res.status(404).json({ error: "Comment not found" }); return; }
+  if (comment.userId !== authUser.id && authUser.role !== "admin") { res.status(403).json({ error: "Forbidden" }); return; }
+
+  const [updated] = await db.update(commentsTable).set({ content: content.trim() }).where(eq(commentsTable.id, id)).returning();
+  res.json({ id: updated.id, content: updated.content, username: authUser.username });
+});
+
 router.delete("/comments/:id", requireAuth, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const id = parseInt(raw, 10);

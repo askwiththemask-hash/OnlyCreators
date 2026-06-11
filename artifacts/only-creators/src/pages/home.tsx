@@ -10,14 +10,13 @@ const CATEGORY_ICONS: Record<string, string> = {
   "resource-packs": "📦",
   "vfx": "✨",
   "gfx": "🎨",
-  "custom-models": "🧱",
-  "server-developers": "🖥️",
-  "recording-managers": "🎙️",
-  "plugin-makers": "🔧",
+  "minecraft-builds": "🏰",
+  "server-setup": "🖥️",
+  "custom-requests": "📋",
+  "plugin-development": "🔧",
   "cinematics": "🎥",
-  "hire-builder": "🏰",
-  "custom-skin": "👕",
-  "mods": "⚙️",
+  "mod-developer": "⚙️",
+  "custom-skins": "👕",
 };
 
 const CATEGORY_GRADIENTS: Record<string, string> = {
@@ -26,14 +25,13 @@ const CATEGORY_GRADIENTS: Record<string, string> = {
   "resource-packs": "from-emerald-600/40 to-emerald-900/20",
   "vfx": "from-yellow-500/40 to-yellow-900/20",
   "gfx": "from-pink-600/40 to-pink-900/20",
-  "custom-models": "from-stone-500/40 to-stone-900/20",
-  "server-developers": "from-cyan-600/40 to-cyan-900/20",
-  "recording-managers": "from-red-600/40 to-red-900/20",
-  "plugin-makers": "from-violet-600/40 to-violet-900/20",
+  "minecraft-builds": "from-amber-600/40 to-amber-900/20",
+  "server-setup": "from-cyan-600/40 to-cyan-900/20",
+  "custom-requests": "from-red-600/40 to-red-900/20",
+  "plugin-development": "from-violet-600/40 to-violet-900/20",
   "cinematics": "from-indigo-600/40 to-indigo-900/20",
-  "hire-builder": "from-amber-600/40 to-amber-900/20",
-  "custom-skin": "from-teal-600/40 to-teal-900/20",
-  "mods": "from-green-600/40 to-green-900/20",
+  "mod-developer": "from-green-600/40 to-green-900/20",
+  "custom-skins": "from-teal-600/40 to-teal-900/20",
 };
 
 export default function Home() {

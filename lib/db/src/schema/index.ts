@@ -10,3 +10,4 @@ export * from "./categories";
 export * from "./messages";
 export * from "./reviews";
 export * from "./notifications";
+export * from "./creator-pins";

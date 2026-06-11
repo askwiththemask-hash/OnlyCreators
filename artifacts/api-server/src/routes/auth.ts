@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { createHash } from "crypto";
-import { db, usersTable } from "@workspace/db";
+import { db, usersTable, creatorPinsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { RegisterBody, LoginBody } from "@workspace/api-zod";
 import { signToken, requireAuth } from "../middlewares/auth";
@@ -18,6 +18,23 @@ router.post("/auth/register", async (req, res): Promise<void> => {
     return;
   }
   const { username, email, password, accountType } = parsed.data;
+  const { creatorPin } = req.body as { creatorPin?: string };
+
+  if (accountType === "creator") {
+    if (!creatorPin || !/^\d{6}$/.test(creatorPin)) {
+      res.status(400).json({ error: "A valid 6-digit Creator PIN is required to register as a creator" });
+      return;
+    }
+    const [pinRow] = await db.select().from(creatorPinsTable).where(eq(creatorPinsTable.pin, creatorPin));
+    if (!pinRow) {
+      res.status(400).json({ error: "Invalid Creator PIN. Contact the admin to receive your PIN." });
+      return;
+    }
+    if (pinRow.used) {
+      res.status(400).json({ error: "This Creator PIN has already been used." });
+      return;
+    }
+  }
 
   const existing = await db.select().from(usersTable).where(eq(usersTable.email, email));
   if (existing.length > 0) {
@@ -38,6 +55,10 @@ router.post("/auth/register", async (req, res): Promise<void> => {
     passwordHash,
     accountType,
   }).returning();
+
+  if (accountType === "creator" && creatorPin) {
+    await db.update(creatorPinsTable).set({ used: true }).where(eq(creatorPinsTable.pin, creatorPin));
+  }
 
   const token = signToken(user.id);
   const { passwordHash: _, ...safeUser } = user;

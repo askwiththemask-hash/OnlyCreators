@@ -24,6 +24,7 @@ import AdminSamples from "@/pages/admin/samples";
 import AdminUsers from "@/pages/admin/users";
 import Messages from "@/pages/messages";
 import Mods from "@/pages/mods";
+import Saved from "@/pages/saved";
 
 function Router() {
   return (
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/creator/:id" component={CreatorProfile} />
       <Route path="/profile" component={UserProfile} />
       <Route path="/messages" component={Messages} />
+      <Route path="/saved" component={Saved} />
 
       {/* Dashboard Routes */}
       <Route path="/dashboard" component={Dashboard} />

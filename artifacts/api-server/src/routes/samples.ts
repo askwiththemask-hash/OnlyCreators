@@ -19,6 +19,7 @@ function formatSample(r: Record<string, unknown>): unknown {
     budget: r.budget ?? null,
     previewImageUrl: r.preview_image_url ?? null,
     previewVideoUrl: r.preview_video_url ?? null,
+    fileUrl: r.file_url ?? null,
     tags: r.tags ?? null,
     status: r.status,
     likeCount: Number(r.like_count ?? 0),
@@ -162,7 +163,8 @@ router.post("/samples", requireAuth, requireCreator, async (req, res): Promise<v
   const [profile] = await db.select().from(creatorProfilesTable).where(eq(creatorProfilesTable.userId, authUser.id));
   if (!profile) { res.status(400).json({ error: "Creator profile required" }); return; }
 
-  const [sample] = await db.insert(samplesTable).values({ ...parsed.data, creatorId: profile.id, status: "approved" }).returning();
+  const { fileUrl } = req.body as { fileUrl?: string };
+  const [sample] = await db.insert(samplesTable).values({ ...parsed.data, ...(fileUrl ? { fileUrl } : {}), creatorId: profile.id, status: "approved" }).returning();
   res.status(201).json(formatSample({ ...sample, creator_name: profile.displayName, creator_avatar_url: profile.avatarUrl, creator_verified: profile.verificationStatus !== "normal", is_liked: false, is_favorited: false, like_count: 0, comment_count: 0 }));
 });
 

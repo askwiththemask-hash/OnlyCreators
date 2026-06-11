@@ -12,6 +12,7 @@ export const samplesTable = pgTable("samples", {
   budget: integer("budget"),
   previewImageUrl: text("preview_image_url"),
   previewVideoUrl: text("preview_video_url"),
+  fileUrl: text("file_url"),
   tags: text("tags"),
   status: text("status").notNull().default("pending"), // pending | approved | rejected
   rejectionReason: text("rejection_reason"),

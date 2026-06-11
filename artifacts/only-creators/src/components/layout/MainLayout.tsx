@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useGetMe, useLogout } from "@workspace/api-client-react";
 import { queryClient } from "@/lib/query-client";
-import { Menu, X, MessageSquare, LayoutDashboard, Shield, User, Bell } from "lucide-react";
+import { Menu, X, MessageSquare, LayoutDashboard, Shield, User, Bell, Bookmark } from "lucide-react";
 
 function getToken() { return localStorage.getItem("auth_token"); }
 async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
@@ -175,6 +175,9 @@ export function Navbar() {
                   <Shield className="w-4 h-4" />Admin
                 </Button>
               )}
+              <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setLocation("/saved")}>
+                <Bookmark className="w-4 h-4" />Saved
+              </Button>
               <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setLocation("/profile")}>
                 <User className="w-4 h-4" />Profile
               </Button>
@@ -218,6 +221,9 @@ export function Navbar() {
                     <Shield className="w-4 h-4" />Admin
                   </Link>
                 )}
+                <Link href="/saved" className="px-3 py-2.5 rounded-md text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+                  <Bookmark className="w-4 h-4" />Saved
+                </Link>
                 <Link href="/profile" className="px-3 py-2.5 rounded-md text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2" onClick={() => setMobileOpen(false)}>
                   <User className="w-4 h-4" />Profile
                 </Link>
@@ -252,6 +258,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
             <Link href="/mods" className="hover:text-primary transition-colors">Mods</Link>
             <Link href="/requests" className="hover:text-primary transition-colors">Requests</Link>
             <Link href="/messages" className="hover:text-primary transition-colors">Messages</Link>
+            <Link href="/saved" className="hover:text-primary transition-colors">Saved</Link>
           </div>
         </div>
       </footer>
