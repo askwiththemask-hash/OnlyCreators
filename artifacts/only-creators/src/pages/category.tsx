@@ -63,9 +63,9 @@ export default function Category() {
             </div>
           ) : samples?.length === 0 ? (
             <div className="text-center py-20 text-muted-foreground">
-              <p className="text-5xl mb-4">{category?.icon ?? "🎮"}</p>
-              <p className="text-lg font-semibold">No samples yet in this category</p>
-              <p className="text-sm mt-1">Be the first to upload!</p>
+              <p className="text-5xl mb-4">⌛</p>
+              <p className="text-lg font-semibold">COMING SOON.....</p>
+              <p className="text-sm mt-1">join our discord for updates</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
