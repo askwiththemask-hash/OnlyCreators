@@ -21,6 +21,7 @@ function formatSample(r: Record<string, unknown>) {
     previewImageUrl: r.preview_image_url ?? r.previewImageUrl ?? null,
     previewVideoUrl: r.preview_video_url ?? r.previewVideoUrl ?? null,
     fileUrl: r.file_url ?? r.fileUrl ?? null,
+    experience: r.experience ?? null,
     tags: r.tags ?? null,
     status: r.status,
     likeCount: Number(r.like_count ?? r.likeCount ?? 0),

@@ -101,6 +101,8 @@ router.post("/messages/:userId", requireAuth, async (req, res): Promise<void> =>
   const recipientId = parseInt(raw, 10);
   if (isNaN(recipientId)) { res.status(400).json({ error: "Invalid userId" }); return; }
 
+  if (recipientId === authUser.id) { res.status(400).json({ error: "You cannot message yourself" }); return; }
+
   const { content, fileUrl, fileType } = req.body as {
     content?: string;
     fileUrl?: string;

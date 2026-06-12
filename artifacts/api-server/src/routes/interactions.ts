@@ -19,6 +19,12 @@ router.post("/samples/:id/like", requireAuth, async (req, res): Promise<void> =>
   const sampleId = parseInt(raw, 10);
   const authUser = (req as typeof req & { user: AnyUser }).user;
 
+  // Fetch sample + owner upfront for self-like check
+  const [sample] = await db.select().from(samplesTable).where(eq(samplesTable.id, sampleId));
+  if (!sample) { res.status(404).json({ error: "Sample not found" }); return; }
+  const [cp] = await db.select().from(creatorProfilesTable).where(eq(creatorProfilesTable.id, sample.creatorId));
+  if (cp && cp.userId === authUser.id) { res.status(400).json({ error: "You cannot like your own content" }); return; }
+
   const existing = await db.select().from(likesTable).where(
     and(eq(likesTable.userId, authUser.id), eq(likesTable.sampleId, sampleId))
   );
@@ -27,13 +33,8 @@ router.post("/samples/:id/like", requireAuth, async (req, res): Promise<void> =>
     await db.delete(likesTable).where(and(eq(likesTable.userId, authUser.id), eq(likesTable.sampleId, sampleId)));
   } else {
     await db.insert(likesTable).values({ userId: authUser.id, sampleId });
-    // Notify sample owner
-    const [sample] = await db.select().from(samplesTable).where(eq(samplesTable.id, sampleId));
-    if (sample) {
-      const [cp] = await db.select().from(creatorProfilesTable).where(eq(creatorProfilesTable.id, sample.creatorId));
-      if (cp && cp.userId !== authUser.id) {
-        await createNotif(cp.userId, "like", `${authUser.username} liked your sample`, authUser.id, authUser.username, sampleId);
-      }
+    if (cp && cp.userId !== authUser.id) {
+      await createNotif(cp.userId, "like", `${authUser.username} liked your sample`, authUser.id, authUser.username, sampleId);
     }
   }
 
@@ -150,6 +151,13 @@ router.post("/samples/:id/reviews", requireAuth, async (req, res): Promise<void>
 
   if (!rating || rating < 1 || rating > 5) { res.status(400).json({ error: "Rating must be 1-5" }); return; }
 
+  // Block self-reviews
+  const [sampleCheck] = await db.select().from(samplesTable).where(eq(samplesTable.id, sampleId));
+  if (sampleCheck) {
+    const [cpCheck] = await db.select().from(creatorProfilesTable).where(eq(creatorProfilesTable.id, sampleCheck.creatorId));
+    if (cpCheck && cpCheck.userId === authUser.id) { res.status(400).json({ error: "You cannot review your own content" }); return; }
+  }
+
   const existing = await db.select().from(reviewsTable).where(
     and(eq(reviewsTable.userId, authUser.id), eq(reviewsTable.sampleId, sampleId))
   );
@@ -205,6 +213,10 @@ router.post("/creators/:id/follow", requireAuth, async (req, res): Promise<void>
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const creatorId = parseInt(raw, 10);
   const authUser = (req as typeof req & { user: AnyUser }).user;
+
+  // Block self-follows
+  const [selfCp] = await db.select().from(creatorProfilesTable).where(eq(creatorProfilesTable.id, creatorId));
+  if (selfCp && selfCp.userId === authUser.id) { res.status(400).json({ error: "You cannot follow yourself" }); return; }
 
   const existing = await db.select().from(followsTable).where(
     and(eq(followsTable.followerId, authUser.id), eq(followsTable.creatorId, creatorId))

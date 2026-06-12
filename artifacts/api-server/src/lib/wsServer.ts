@@ -108,6 +108,7 @@ export function setupWebSocketServer(server: Server): WebSocketServer {
         const fileType = (msg.fileType as string | null | undefined) ?? null;
 
         if (!recipientId || (!content.trim() && !fileUrl)) return;
+        if (recipientId === ws.userId) return; // block self-messages
 
         const [recipient] = await db.select({ id: usersTable.id, username: usersTable.username })
           .from(usersTable).where(eq(usersTable.id, recipientId));

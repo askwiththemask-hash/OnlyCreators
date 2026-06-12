@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useLocation } from "wouter";
-import { useGetSample, useToggleLike, useToggleFavorite, useGetComments, useAddComment, useDeleteComment } from "@workspace/api-client-react";
+import { useGetSample, useGetSamples, useToggleLike, useToggleFavorite, useGetComments, useAddComment, useDeleteComment } from "@workspace/api-client-react";
 import { queryClient } from "@/lib/query-client";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -65,7 +65,10 @@ export default function SampleDetail() {
   const [deleteCommentTarget, setDeleteCommentTarget] = useState<number | null>(null);
 
   const { data: sample, isLoading } = useGetSample(sampleId);
-  const { data: comments, refetch: refetchComments } = useGetComments({ id: sampleId });
+  const { data: comments, refetch: refetchComments } = useGetComments(sampleId);
+  const { data: relatedSamples } = useGetSamples(
+    sample?.category ? { category: sample.category, limit: 5 } : undefined
+  );
   const toggleLike = useToggleLike();
   const toggleFavorite = useToggleFavorite();
   const addComment = useAddComment();
@@ -213,7 +216,7 @@ export default function SampleDetail() {
         message="Are you sure you want to delete this comment? This cannot be undone."
         confirmLabel="Delete"
         cancelLabel="Cancel"
-        onConfirm={() => deleteCommentTarget !== null && handleDeleteComment(deleteCommentTarget)}
+        onConfirm={() => { if (deleteCommentTarget !== null) handleDeleteComment(deleteCommentTarget); }}
         onCancel={() => setDeleteCommentTarget(null)}
         loading={deleteComment.isPending}
       />
@@ -551,7 +554,9 @@ export default function SampleDetail() {
                 <p className="text-5xl font-black text-primary mb-1">₹{sample.budget}</p>
                 <p className="text-xs text-muted-foreground mb-5">Contact creator for exact pricing</p>
                 <Link href={`/creator/${sample.creatorId}`}>
-                  <Button className="w-full shadow-[0_0_20px_-5px_hsl(var(--primary))]">💼 Hire Creator</Button>
+                  <Button className="w-full shadow-[0_0_20px_-5px_hsl(var(--primary))]">
+                    {sample.category === "mod-developer" ? "🛒 Buy Mod" : "💼 Hire Creator"}
+                  </Button>
                 </Link>
                 {sample.creatorName && (
                   <p className="text-xs text-muted-foreground mt-3">by <span className="text-primary">{sample.creatorName}</span></p>
@@ -591,6 +596,12 @@ export default function SampleDetail() {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Game</span>
                   <span className="font-semibold">{sample.gameType}</span>
+                </div>
+              )}
+              {(sample as typeof sample & { experience?: string | null }).experience && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Experience</span>
+                  <span className="font-semibold">{(sample as typeof sample & { experience?: string | null }).experience}</span>
                 </div>
               )}
               <div className="flex justify-between">
@@ -641,6 +652,43 @@ export default function SampleDetail() {
           </div>
         </div>
       </div>
+
+      {/* ── MORE LIKE THIS ─────────────────────────────────── */}
+      {relatedSamples && relatedSamples.filter(s => s.id !== sampleId).length > 0 && (
+        <div className="container mx-auto px-4 pb-16 max-w-6xl">
+          <div className="border-t border-white/10 pt-12">
+            <h2 className="text-xl font-black mb-6">More Like This</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {relatedSamples
+                .filter(s => s.id !== sampleId)
+                .slice(0, 4)
+                .map(s => (
+                  <Link
+                    key={s.id}
+                    href={`/sample/${s.id}`}
+                    className="group block rounded-xl overflow-hidden bg-card border border-white/5 hover:border-primary/40 transition-all hover:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.3)]"
+                  >
+                    <div className="aspect-video bg-muted overflow-hidden">
+                      {s.previewImageUrl ? (
+                        <img src={s.previewImageUrl} alt={s.title ?? ""} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-3xl">🎮</div>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <h3 className="font-bold text-sm truncate group-hover:text-primary transition-colors">{s.title}</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">{s.creatorName}</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-muted-foreground">❤️ {s.likeCount ?? 0}</span>
+                        {s.budget != null && <span className="text-xs font-bold text-primary">₹{s.budget}</span>}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 }

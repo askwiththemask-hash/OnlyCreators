@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
-import { Upload, X, Image, Video, File, CheckCircle2, Loader2 } from "lucide-react";
+import { Upload, X, Image, Video, File, CheckCircle2, Loader2, Link as LinkIcon } from "lucide-react";
 
 const GAME_TYPES = ["Minecraft", "Roblox", "BGMI", "Free Fire", "GTA V", "Fortnite", "Valorant", "General"];
 
@@ -42,6 +42,8 @@ interface CategoryConfig {
   fileAccept: string;
   fileLabel: string;
   fileHint: string;
+  isExperienceBased?: boolean;
+  hasPortfolioUrl?: boolean;
 }
 
 const CATEGORY_CONFIG: Record<string, CategoryConfig> = {
@@ -67,12 +69,23 @@ const CATEGORY_CONFIG: Record<string, CategoryConfig> = {
     fileLabel: "Plugin File (ZIP or JAR) — required",
     fileHint: "ZIP, JAR · Max 100 MB",
   },
-  "minecraft-builds": {
+  "resource-packs": {
     hasVideo: false, videoRequired: false, videoLabel: "",
     hasFile: true, fileRequired: true,
-    fileAccept: ".zip,.mcworld",
-    fileLabel: "World File (ZIP or .mcworld) — required",
-    fileHint: "ZIP, MCWORLD · Max 100 MB",
+    fileAccept: ".zip",
+    fileLabel: "Resource Pack (ZIP) — required",
+    fileHint: "ZIP · Max 100 MB",
+  },
+  "minecraft-builds": {
+    hasVideo: true, videoRequired: false, videoLabel: "Portfolio Video (optional)",
+    hasFile: false, fileRequired: false, fileAccept: "", fileLabel: "", fileHint: "",
+    isExperienceBased: true,
+  },
+  "recording-manager": {
+    hasVideo: true, videoRequired: false, videoLabel: "Portfolio Video (optional)",
+    hasFile: false, fileRequired: false, fileAccept: "", fileLabel: "", fileHint: "",
+    isExperienceBased: true,
+    hasPortfolioUrl: true,
   },
 };
 
@@ -245,12 +258,14 @@ function FileDropZone({
   );
 }
 
+const EXPERIENCE_LEVELS = ["Less than 1 year", "1-2 years", "2-3 years", "3-5 years", "5-7 years", "7+ years"];
+
 export default function DashboardUpload() {
   const [, setLocation] = useLocation();
   const { isCreator } = useAuth();
   const { data: categories } = useGetCategories();
 
-  const [form, setForm] = useState({ title: "", description: "", category: "", gameType: "", budget: "", tags: "" });
+  const [form, setForm] = useState({ title: "", description: "", category: "", gameType: "", budget: "", tags: "", experience: "", portfolioUrl: "" });
   const [thumbnail, setThumbnail] = useState<UploadedFile | null>(null);
   const [videoPreview, setVideoPreview] = useState<UploadedFile | null>(null);
   const [downloadFile, setDownloadFile] = useState<UploadedGenericFile | null>(null);
@@ -308,7 +323,9 @@ export default function DashboardUpload() {
     e.preventDefault();
     setError("");
 
-    if (!thumbnail) { setError("Please upload a preview image for your work."); return; }
+    if (!thumbnail && !config.isExperienceBased) { setError("Please upload a preview image for your work."); return; }
+    if (config.isExperienceBased && !thumbnail) { setError("Please upload a portfolio image."); return; }
+    if (config.isExperienceBased && !form.experience) { setError("Please select your experience level."); return; }
     if (config.videoRequired && !videoPreview) { setError("A video sample is required for this category."); return; }
     if (config.fileRequired && !downloadFile) { setError("A downloadable file is required for this category."); return; }
 
@@ -321,9 +338,14 @@ export default function DashboardUpload() {
         category: form.category,
         gameType: form.gameType || undefined,
         budget: form.budget ? parseInt(form.budget, 10) : undefined,
-        previewImageUrl: `/api/storage${thumbnail.objectPath}`,
+        previewImageUrl: thumbnail ? `/api/storage${thumbnail.objectPath}` : undefined,
         previewVideoUrl: videoPreview ? `/api/storage${videoPreview.objectPath}` : undefined,
-        fileUrl: downloadFile ? `/api/storage${downloadFile.objectPath}` : undefined,
+        fileUrl: downloadFile
+          ? `/api/storage${downloadFile.objectPath}`
+          : config.hasPortfolioUrl && form.portfolioUrl
+          ? form.portfolioUrl
+          : undefined,
+        experience: form.experience || undefined,
         tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean).join(",") : undefined,
       };
 
@@ -379,7 +401,8 @@ export default function DashboardUpload() {
   const isUploading = uploadingThumbnail || uploadingVideo || uploadingFile;
   const canSubmit = form.title && form.category && thumbnail && !isUploading && !submitting
     && (!config.videoRequired || videoPreview)
-    && (!config.fileRequired || downloadFile);
+    && (!config.fileRequired || downloadFile)
+    && (!config.isExperienceBased || form.experience);
 
   return (
     <MainLayout>
@@ -424,14 +447,33 @@ export default function DashboardUpload() {
                   {form.category === "thumbnail-designing" && "📸 Image Upload Only"}
                   {form.category === "video-editing" && "🎬 Image Thumbnail + Video Sample Required"}
                   {(form.category === "mod-developer" || form.category === "plugin-development") && "📦 Image Preview + Mod/Plugin File Required"}
-                  {form.category === "minecraft-builds" && "🏰 Screenshot + World File Required"}
-                  {!["thumbnail-designing","video-editing","mod-developer","plugin-development","minecraft-builds"].includes(form.category) && "🖼️ Image Required · Video Optional"}
+                  {form.category === "resource-packs" && "📦 Image Preview + Resource Pack ZIP Required"}
+                  {form.category === "minecraft-builds" && "🏗️ Portfolio Images + Videos + Experience Required"}
+                  {form.category === "recording-manager" && "🎙️ Portfolio Images + Videos + Experience Required"}
+                  {!["thumbnail-designing","video-editing","mod-developer","plugin-development","resource-packs","minecraft-builds","recording-manager"].includes(form.category) && "🖼️ Image Required · Video Optional"}
                 </p>
 
-                {/* Preview Image — always required */}
+                {/* Experience level — for experience-based categories */}
+                {config.isExperienceBased && (
+                  <div>
+                    <Label className="mb-2 block">Experience Level <span className="text-destructive">*</span></Label>
+                    <Select value={form.experience} onValueChange={v => update("experience", v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="How many years of experience?" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {EXPERIENCE_LEVELS.map(lvl => (
+                          <SelectItem key={lvl} value={lvl}>{lvl}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Portfolio Image — required for all */}
                 <div>
                   <Label className="mb-2 block">
-                    {form.category === "video-editing" ? "Thumbnail Image" : "Preview Image"} <span className="text-destructive">*</span>
+                    {config.isExperienceBased ? "Portfolio Image" : form.category === "video-editing" ? "Thumbnail Image" : "Preview Image"} <span className="text-destructive">*</span>
                   </Label>
                   <MediaDropZone
                     accept="image/png,image/jpeg,image/webp,image/gif"
@@ -445,7 +487,7 @@ export default function DashboardUpload() {
                   <p className="text-xs text-muted-foreground mt-1.5">PNG, JPG, WEBP · Max 100 MB</p>
                 </div>
 
-                {/* Video field — video-editing required; others optional */}
+                {/* Video field — video-editing required; experience-based optional */}
                 {config.hasVideo && (
                   <div>
                     <Label className="mb-2 block">
@@ -479,6 +521,23 @@ export default function DashboardUpload() {
                       onRemove={() => setDownloadFile(null)}
                       isUploading={uploadingFile}
                     />
+                  </div>
+                )}
+
+                {/* Portfolio URL — for recording-manager */}
+                {config.hasPortfolioUrl && (
+                  <div>
+                    <Label htmlFor="portfolioUrl" className="mb-2 block">
+                      <span className="inline-flex items-center gap-1.5"><LinkIcon className="w-3.5 h-3.5" /> Portfolio URL (optional)</span>
+                    </Label>
+                    <Input
+                      id="portfolioUrl"
+                      value={form.portfolioUrl}
+                      onChange={e => update("portfolioUrl", e.target.value)}
+                      placeholder="https://youtube.com/your-channel"
+                      type="url"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1.5">Link to your YouTube channel, portfolio site, etc.</p>
                   </div>
                 )}
               </div>
