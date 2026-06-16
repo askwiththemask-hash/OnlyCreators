@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Only Creators"
+title = "OnlyCreators"
 version = "1.0.0"
 id = "artifacts/only-creators"
 router = "path"
