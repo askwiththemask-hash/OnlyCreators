@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useGetMe, useLogout } from "@workspace/api-client-react";
+import { useGetMe, useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
 import { queryClient } from "@/lib/query-client";
 import { Menu, X, MessageSquare, LayoutDashboard, Shield, User, Bell, Bookmark } from "lucide-react";
 
@@ -27,7 +27,7 @@ function NotificationBell() {
   const [notifs, setNotifs] = useState<Notification[]>([]);
   const [unread, setUnread] = useState(0);
   const panelRef = useRef<HTMLDivElement>(null);
-  const { data: user } = useGetMe({ query: { retry: false } });
+  const { data: user } = useGetMe({ query: { retry: false, queryKey: getGetMeQueryKey() } });
 
   useEffect(() => {
     if (!user) return;
@@ -116,7 +116,7 @@ function NotificationBell() {
 export function Navbar() {
   const [location, setLocation] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { data: user } = useGetMe({ query: { retry: false } });
+  const { data: user } = useGetMe({ query: { retry: false, queryKey: getGetMeQueryKey() } });
   const logout = useLogout();
 
   const handleLogout = () => {

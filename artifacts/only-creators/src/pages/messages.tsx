@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
 import { useWebSocket, type WSMsg } from "@/hooks/use-websocket";
-import { Send, Paperclip, MessageSquare, Search, X, File, ImageIcon, Check, CheckCheck } from "lucide-react";
+import { Send, Paperclip, MessageSquare, Search, X, File, Image as ImageIcon, Check, CheckCheck } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -259,7 +259,7 @@ export default function Messages() {
       }
 
       if (msg.type === "typing") {
-        const { senderId, isTyping } = msg as { senderId: number; isTyping: boolean };
+        const { senderId, isTyping } = msg as unknown as { senderId: number; isTyping: boolean };
         setTypingUsers(s => {
           const n = new Set(s);
           if (isTyping) n.add(senderId); else n.delete(senderId);
@@ -268,13 +268,13 @@ export default function Messages() {
       }
 
       if (msg.type === "read_receipt") {
-        const { readBy } = msg as { readBy: number };
+        const { readBy } = msg as unknown as { readBy: number };
         setMessages(prev => prev.map(m => m.recipient_id === readBy ? { ...m, is_read: true } : m));
         setReadReceipts(s => new Set([...s, readBy]));
       }
 
       if (msg.type === "online_status") {
-        const { userId: uid, isOnline } = msg as { userId: number; isOnline: boolean };
+        const { userId: uid, isOnline } = msg as unknown as { userId: number; isOnline: boolean };
         setOnlineUsers(s => {
           const n = new Set(s);
           if (isOnline) n.add(uid); else n.delete(uid);
@@ -283,7 +283,7 @@ export default function Messages() {
       }
 
       if (msg.type === "online_users") {
-        const { userIds } = msg as { userIds: number[] };
+        const { userIds } = msg as unknown as { userIds: number[] };
         setOnlineUsers(new Set(userIds));
       }
     });

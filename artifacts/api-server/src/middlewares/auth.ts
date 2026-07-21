@@ -3,6 +3,8 @@ import { db, usersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { createHmac } from "crypto";
 
+export type AnyUser = typeof usersTable.$inferSelect;
+
 const SECRET = process.env.SESSION_SECRET ?? "only-creators-secret-key-2024";
 
 export function signToken(userId: number): string {

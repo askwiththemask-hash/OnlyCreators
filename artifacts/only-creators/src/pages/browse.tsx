@@ -35,7 +35,7 @@ function SampleCard({ sample }: { sample: { id: number; title: string; creatorNa
   );
 }
 
-function CreatorCard({ creator }: { creator: { id: number; displayName: string; servicesOffered?: string | null; avatarUrl?: string | null; verificationStatus: string; totalLikes?: number; totalSamples?: number } }) {
+function CreatorCard({ creator }: { creator: { id: number; displayName: string; servicesOffered?: string | null; avatarUrl?: string | null; verificationStatus?: string; totalLikes?: number; totalSamples?: number } }) {
   return (
     <Link href={`/creator/${creator.id}`} className="group block rounded-xl overflow-hidden bg-card border border-white/5 hover:border-primary/40 transition-all p-5">
       <div className="flex items-center gap-4 mb-4">

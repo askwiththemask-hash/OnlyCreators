@@ -121,7 +121,7 @@ export default function Home() {
                   <div className="relative z-10 flex flex-col items-center justify-center text-center px-3 gap-2">
                     <span className="text-4xl group-hover:scale-110 transition-transform duration-300 drop-shadow-lg">{icon}</span>
                     <p className="font-bold text-white text-sm group-hover:text-primary transition-colors duration-200 leading-tight">{cat.name}</p>
-                    {cat.sampleCount > 0 && (
+                    {(cat.sampleCount ?? 0) > 0 && (
                       <span className="text-xs text-white/50 group-hover:text-white/70 transition-colors">{cat.sampleCount} samples</span>
                     )}
                   </div>

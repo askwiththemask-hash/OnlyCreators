@@ -38,7 +38,8 @@ router.post("/samples/:id/like", requireAuth, async (req, res): Promise<void> =>
     }
   }
 
-  const [r] = await db.execute(sql`SELECT COUNT(*)::int as count FROM likes WHERE sample_id = ${sampleId}`) as { rows: Array<{ count: number }> };
+  const _r1 = await db.execute(sql`SELECT COUNT(*)::int as count FROM likes WHERE sample_id = ${sampleId}`) as { rows: Array<{ count: number }> };
+  const r = _r1.rows[0];
   res.json({ liked: existing.length === 0, likeCount: r?.count ?? 0 });
 });
 
@@ -233,7 +234,8 @@ router.post("/creators/:id/follow", requireAuth, async (req, res): Promise<void>
     }
   }
 
-  const [r] = await db.execute(sql`SELECT COUNT(*)::int as count FROM follows WHERE creator_id = ${creatorId}`) as { rows: Array<{ count: number }> };
+  const _r2 = await db.execute(sql`SELECT COUNT(*)::int as count FROM follows WHERE creator_id = ${creatorId}`) as { rows: Array<{ count: number }> };
+  const r = _r2.rows[0];
   res.json({ following: existing.length === 0, followerCount: r?.count ?? 0 });
 });
 

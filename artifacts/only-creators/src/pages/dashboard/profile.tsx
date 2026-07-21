@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
-import { Camera, Loader2, CheckCircle2 } from "lucide-react";
+import { Camera, Loader as Loader2, CircleCheck as CheckCircle2 } from "lucide-react";
 
 const EXPERIENCE_LEVELS = ["Less than 1 year", "1 year", "2 years", "3 years", "4 years", "5 years", "6+ years"];
 
@@ -111,19 +111,33 @@ export default function DashboardProfile() {
       avatarUrl: form.avatarUrl || undefined,
     };
 
-    const mutation = profile ? updateProfile : createProfile;
-    mutation.mutate({ data } as Parameters<typeof mutation.mutate>[0], {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["getMyCreatorProfile"] });
-        setMsg(profile ? "Profile updated!" : "Profile created!");
-        setAvatarPreview(null);
-        setTimeout(() => setMsg(""), 3000);
-      },
-      onError: (err: unknown) => {
-        const apiErr = err as { data?: { error?: string }; message?: string };
-        setError(apiErr?.data?.error ?? apiErr?.message ?? "Failed to save");
-      },
-    });
+    if (profile) {
+      updateProfile.mutate({ data } as Parameters<typeof updateProfile.mutate>[0], {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["getMyCreatorProfile"] });
+          setMsg("Profile updated!");
+          setAvatarPreview(null);
+          setTimeout(() => setMsg(""), 3000);
+        },
+        onError: (err: unknown) => {
+          const apiErr = err as { data?: { error?: string }; message?: string };
+          setError(apiErr?.data?.error ?? apiErr?.message ?? "Failed to save");
+        },
+      });
+    } else {
+      createProfile.mutate({ data } as Parameters<typeof createProfile.mutate>[0], {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["getMyCreatorProfile"] });
+          setMsg("Profile created!");
+          setAvatarPreview(null);
+          setTimeout(() => setMsg(""), 3000);
+        },
+        onError: (err: unknown) => {
+          const apiErr = err as { data?: { error?: string }; message?: string };
+          setError(apiErr?.data?.error ?? apiErr?.message ?? "Failed to save");
+        },
+      });
+    }
   };
 
   if (!isCreator) {

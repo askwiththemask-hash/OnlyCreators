@@ -37,7 +37,7 @@ export default function CreatorProfile() {
   const [allReviews, setAllReviews] = useState<ReviewsData[]>([]);
 
   const { data: creator, isLoading } = useGetCreatorById(creatorId);
-  const { data: samples } = useGetSamples({ creatorId: creatorId.toString() });
+  const { data: samples } = useGetSamples({ creatorId: creatorId });
   const toggleFollow = useToggleFollow();
 
   // Sync follower state from loaded creator
