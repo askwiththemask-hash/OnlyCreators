@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
 import { useWebSocket, type WSMsg } from "@/hooks/use-websocket";
-import { Send, Paperclip, MessageSquare, Search, X, File, Image as ImageIcon, Check, CheckCheck } from "lucide-react";
+import { Send, Paperclip, MessageSquare, Search, X, File, ImageIcon, Check, CheckCheck } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

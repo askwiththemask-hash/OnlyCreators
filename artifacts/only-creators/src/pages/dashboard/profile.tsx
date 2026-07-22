@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
-import { Camera, Loader as Loader2, CircleCheck as CheckCircle2 } from "lucide-react";
+import { Camera, Loader2, CheckCircle2 } from "lucide-react";
 
 const EXPERIENCE_LEVELS = ["Less than 1 year", "1 year", "2 years", "3 years", "4 years", "5 years", "6+ years"];
 
